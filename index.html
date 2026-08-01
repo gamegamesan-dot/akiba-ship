@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Send It Home — Akihabara Shipping Desk</title>
+<meta name="description" content="Bought too much in Akihabara? We create the customs label, hold your parcel, and ship it home for you.">
+<meta name="theme-color" content="#16181d">
+<style>
+:root{
+  --ink:#16181d; --ink2:#41454e; --mute:#7b8089;
+  --paper:#f7f5f0; --card:#fff; --line:#ddd8cd;
+  --navy:#1b3a5c; --red:#c8102e; --green:#1f7a4d; --amber:#fff6dd; --amber-line:#e0b93a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--ink)}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Noto Sans JP","Noto Sans TC","Noto Sans SC","Noto Sans KR",sans-serif;
+  font-size:16px;line-height:1.65;-webkit-text-size-adjust:100%}
+.num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px}
+
+/* language bar */
+.langbar{position:sticky;top:0;z-index:20;background:var(--ink);padding:calc(6px + env(safe-area-inset-top)) 0 6px}
+.langs{display:flex;gap:4px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.langs::-webkit-scrollbar{display:none}
+.langs button{flex:0 0 auto;padding:7px 12px;font-size:13px;font-weight:700;border:0;border-radius:2px;
+  background:transparent;color:#9aa0aa;font-family:inherit;white-space:nowrap}
+.langs button[aria-pressed=true]{background:var(--paper);color:var(--ink)}
+
+/* hero */
+header{background:var(--ink);color:#f2efe8;padding:22px 0 30px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;
+  background:repeating-linear-gradient(90deg,var(--red) 0 14px,transparent 14px 28px,#f2efe8 28px 42px,transparent 42px 56px)}
+.kicker{font-size:11px;letter-spacing:.22em;font-weight:700;color:var(--red)}
+h1{font-size:29px;line-height:1.25;letter-spacing:-.02em;margin:8px 0 10px;font-weight:800}
+.lede{font-size:15.5px;color:#c3c8d0;margin:0}
+
+/* blocks */
+section{margin-top:26px}
+h2{font-size:12px;letter-spacing:.16em;font-weight:800;color:var(--mute);margin:0 0 12px;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 17px}
+.card + .card{margin-top:10px}
+
+.step{display:flex;gap:14px;align-items:flex-start}
+.step + .step{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.stepno{flex:0 0 30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.step h3{font-size:16px;margin:2px 0 3px;font-weight:700}
+.step p{margin:0;font-size:14.5px;color:var(--ink2)}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+td{padding:9px 0;border-bottom:1px solid #eeeae1;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.r{text-align:right;white-space:nowrap;font-weight:700}
+.small{font-size:12.5px;color:var(--mute);line-height:1.6}
+
+.warn{background:var(--amber);border:1px solid var(--amber-line);border-radius:4px;padding:15px 16px}
+.warn h3{margin:0 0 7px;font-size:15.5px;color:#6b5300;font-weight:800}
+.warn p{margin:0;font-size:14px;color:#6b5300}
+
+.no{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.no span{font-size:13px;background:#fbe9e9;color:#8f1420;border:1px solid #f0c9cd;
+  padding:4px 9px;border-radius:2px;font-weight:600}
+
+/* form */
+label.f{display:block;font-size:13px;font-weight:700;color:var(--ink2);margin:12px 0 5px}
+select,input[type=number]{width:100%;padding:11px;font-size:16px;border:1px solid var(--line);
+  border-radius:3px;background:#fcfbf8;color:var(--ink);font-family:inherit}
+input[type=number]{font-family:ui-monospace,Menlo,monospace;text-align:right}
+select:focus,input:focus{outline:2px solid var(--navy);outline-offset:-1px;background:#fff}
+.est{margin-top:15px;background:var(--ink);color:#fff;border-radius:4px;padding:14px 15px}
+.est .lbl{font-size:11px;letter-spacing:.14em;color:#9aa0aa;font-weight:700}
+.est .v{font-size:27px;font-weight:800;margin-top:2px;letter-spacing:-.01em}
+.est .sub{font-size:12.5px;color:#9aa0aa;margin-top:4px;line-height:1.55}
+
+.btn{display:block;width:100%;text-align:center;text-decoration:none;padding:15px;
+  border-radius:3px;font-weight:800;font-size:16px;margin-top:9px;border:0;font-family:inherit}
+.btn.line{background:#06c755;color:#fff}
+.btn.wa{background:#25d366;color:#fff}
+.btn.mail{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+
+footer{margin-top:34px;background:var(--ink);color:#8d939c;padding:22px 0 calc(26px + env(safe-area-inset-bottom));font-size:12.5px;line-height:1.7}
+footer b{color:#e7e3da}
+[data-i18n]{}
+</style>
+</head>
+<body>
+
+<div class="langbar">
+  <div class="wrap">
+    <div class="langs" id="langs">
+      <button data-lang="en" aria-pressed="true">English</button>
+      <button data-lang="zh-Hant" aria-pressed="false">繁體中文</button>
+      <button data-lang="zh-Hans" aria-pressed="false">简体中文</button>
+      <button data-lang="ko" aria-pressed="false">한국어</button>
+      <button data-lang="ja" aria-pressed="false">日本語</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">AKIHABARA · TOKYO</div>
+    <h1 data-i18n="h1"></h1>
+    <p class="lede" data-i18n="lede"></p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2 data-i18n="how_h"></h2>
+    <div class="card">
+      <div class="step"><div class="stepno">1</div><div>
+        <h3 data-i18n="s1t"></h3><p data-i18n="s1b"></p></div></div>
+      <div class="step"><div class="stepno">2</div><div>
+        <h3 data-i18n="s2t"></h3><p data-i18n="s2b"></p></div></div>
+      <div class="step"><div class="stepno">3</div><div>
+        <h3 data-i18n="s3t"></h3><p data-i18n="s3b"></p></div></div>
+      <div class="step"><div class="stepno">4</div><div>
+        <h3 data-i18n="s4t"></h3><p data-i18n="s4b"></p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="why_h"></h2>
+    <div class="card">
+      <table>
+        <tr><td data-i18n="w1"></td></tr>
+        <tr><td data-i18n="w2"></td></tr>
+        <tr><td data-i18n="w3"></td></tr>
+        <tr><td data-i18n="w4"></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="quote_h"></h2>
+    <div class="card">
+      <label class="f" data-i18n="q_dest"></label>
+      <select id="dest">
+        <option value="4">United States</option>
+        <option value="3">Europe / Canada / Australia</option>
+        <option value="2">Asia (SE Asia, India, etc.)</option>
+        <option value="1">Taiwan / Hong Kong / Korea / China</option>
+      </select>
+
+      <label class="f" data-i18n="q_weight"></label>
+      <select id="wt">
+        <option value="500">～0.5 kg</option>
+        <option value="1000" selected>～1 kg</option>
+        <option value="2000">～2 kg</option>
+        <option value="3000">～3 kg</option>
+        <option value="5000">～5 kg</option>
+      </select>
+
+      <label class="f" data-i18n="q_days"></label>
+      <select id="days">
+        <option value="0" selected>0</option>
+        <option value="3">3</option>
+        <option value="7">7</option>
+        <option value="14">14</option>
+      </select>
+
+      <div class="est">
+        <div class="lbl" data-i18n="q_est"></div>
+        <div class="v num" id="estVal">—</div>
+        <div class="sub" id="estSub"></div>
+      </div>
+
+      <a class="btn wa" id="btnWa" href="#" data-i18n="btn_wa"></a>
+      <a class="btn line" id="btnLine" href="#" data-i18n="btn_line"></a>
+      <a class="btn mail" id="btnMail" href="#" data-i18n="btn_mail"></a>
+      <p class="small" style="margin-top:12px" data-i18n="q_note"></p>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="tax_h"></h2>
+    <div class="warn">
+      <h3 data-i18n="tax_t"></h3>
+      <p data-i18n="tax_b"></p>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="cant_h"></h2>
+    <div class="card">
+      <p class="small" style="margin:0 0 10px" data-i18n="cant_b"></p>
+      <div class="no" id="noList"></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div style="margin-bottom:8px"><b id="bizName">Ocean Trading Co., Ltd.</b></div>
+    <div data-i18n="foot"></div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   設定 — ここだけ書き換えれば全部反映されます
+   ============================================================ */
+var CONFIG = {
+  bizName:  "Ocean Trading Co., Ltd. / 有限会社オーシャン貿易",
+  whatsapp: "819000000000",              // 国番号81 + 先頭0を除いた番号
+  lineId:   "your-line-id",              // LINE公式アカウントID（@は除く）
+  email:    "hello@example.com",
+
+  handling: 1800,   // 1個あたりの取扱手数料（ラベル作成・申告・持込）
+  freeDays: 3,      // 無料保管日数
+  perDay:   200,    // 無料日数を超えた1日あたりの保管料
+
+  // 国際エアパケット実費（円）— 日本郵便 2026年7月時点
+  post: {
+    1:{500:1120,1000:1620,2000:2620,3000:null,5000:null},
+    2:{500:1230,1000:1830,2000:3030,3000:null,5000:null},
+    3:{500:1600,1000:2500,2000:4300,3000:null,5000:null},
+    4:{500:2040,1000:3090,2000:5190,3000:null,5000:null}
+  },
+  // 2kg超はEMS実費（円）
+  ems: {
+    1:{3000:4400,5000:6400}, 2:{3000:5750,5000:8150},
+    3:{3000:8800,5000:13000}, 4:{3000:10300,5000:15100}
+  }
+};
+
+var I18N = {
+en:{
+ h1:"Your suitcase is full.<br>We'll send the rest home.",
+ lede:"Drop your Akihabara haul with us. We write the customs paperwork, hold it as long as you need, and post it to your door.",
+ how_h:"How it works",
+ s1t:"Message us", s1b:"Tell us your destination country and roughly how much you bought. We reply with a firm quote.",
+ s2t:"Hand over your bags", s2b:"Meet us in Akihabara, or send them to us from your hotel. We check and repack everything properly.",
+ s3t:"We do the paperwork", s3b:"Japan Post no longer accepts handwritten customs labels, and the online system is Japanese-only. We handle it, in your name, correctly.",
+ s4t:"Choose your ship date", s4b:"Leave it with us and travel light. Tell us when to send — we post it and give you the tracking number.",
+ why_h:"Why not do it yourself",
+ w1:"Handwritten customs labels are no longer accepted. Everything must go through Japan Post's online system, which is in Japanese.",
+ w2:"US-bound parcels now require duties to be prepaid through a separate app, and can only be accepted at a handful of designated post offices.",
+ w3:"A wrong item description or declared value can get your parcel returned or held at your own customs.",
+ w4:"We ship internationally from Akihabara every single day. This is our normal work, not a favour.",
+ quote_h:"Estimate",
+ q_dest:"Where are we sending it?", q_weight:"Roughly how heavy?", q_days:"Days you want us to hold it",
+ q_est:"ESTIMATED TOTAL",
+ btn_wa:"Ask on WhatsApp", btn_line:"Ask on LINE", btn_mail:"Ask by email",
+ q_note:"Estimate only. Final price depends on actual weight and box size after repacking. Postage is charged at cost — we don't mark it up.",
+ tax_h:"Please read first",
+ tax_t:"Shipping means no tax refund on those items",
+ tax_b:"From 1 November 2026 Japan refunds consumption tax only after customs confirms you are carrying the goods out at the airport. Anything you post home will not be with you at departure, so no refund on those items. Small or expensive things are usually worth carrying yourself; bulky, cheaper things are usually worth shipping. Ask us and we'll help you split it.",
+ cant_h:"What we cannot ship",
+ cant_b:"Postal and customs rules, not ours. If you are unsure, ask before you buy.",
+ foot:"Licensed second-hand dealer registered in Tokyo. Parcels are sent in your name as the sender. We are not a customs broker and do not provide tax advice.",
+ no:["Lithium batteries (loose)","Power banks","Aerosols","Perfume / alcohol-based","Lighters","Food (varies by country)","Counterfeit goods","Anything sealed we cannot inspect"]
+},
+"zh-Hant":{
+ h1:"行李箱已經塞不下了。<br>剩下的交給我們寄回家。",
+ lede:"把秋葉原買的東西交給我們。我們幫你填報關資料、代為保管，再寄到你家門口。",
+ how_h:"服務流程",
+ s1t:"先傳訊息給我們", s1b:"告訴我們寄送國家與大概的數量，我們回覆確定金額。",
+ s2t:"把東西交給我們", s2b:"在秋葉原面交，或從飯店寄給我們。我們會逐一確認並重新包裝。",
+ s3t:"報關手續由我們處理", s3b:"日本郵局已不接受手寫報關單，線上系統只有日文。我們以你的名義正確填寫。",
+ s4t:"自己決定寄出日", s4b:"東西放我們這裡，你輕鬆繼續玩。想寄的時候告訴我們，寄出後提供追蹤號碼。",
+ why_h:"為什麼不自己寄就好",
+ w1:"手寫報關單已全面停用，必須透過日本郵局的線上系統，而該系統只有日文介面。",
+ w2:"寄往美國的包裹現在必須先用另一個App預繳關稅，而且只有少數指定郵局才收件。",
+ w3:"品名或申報金額寫錯，包裹可能被退回，或卡在你自己國家的海關。",
+ w4:"我們每天都從秋葉原寄國際包裹。這是我們的日常工作，不是幫忙。",
+ quote_h:"費用試算",
+ q_dest:"寄到哪裡？", q_weight:"大概多重？", q_days:"希望我們保管幾天",
+ q_est:"預估總金額",
+ btn_wa:"用 WhatsApp 詢問", btn_line:"用 LINE 詢問", btn_mail:"用 Email 詢問",
+ q_note:"僅為預估。實際金額依重新包裝後的重量與箱子尺寸而定。郵資照實收，不加價。",
+ tax_h:"請務必先閱讀",
+ tax_t:"寄回國的商品無法退稅",
+ tax_b:"自2026年11月1日起，日本改為在機場由海關確認你確實帶著商品出境後才退還消費稅。寄回家的東西出境時不在你身上，因此那些商品無法退稅。體積小、單價高的建議自己帶；體積大、單價低的建議寄。可以問我們，我們幫你分。",
+ cant_h:"無法寄送的物品",
+ cant_b:"這是郵政與海關的規定。不確定的話，購買前請先問我們。",
+ foot:"東京都公安委員會許可之古物商。包裹以你本人為寄件人名義寄出。我們並非報關業者，也不提供稅務諮詢。",
+ no:["鋰電池（單獨）","行動電源","噴霧罐","香水／含酒精","打火機","食品（依國家而異）","仿冒品","無法開箱確認的密封物"]
+},
+"zh-Hans":{
+ h1:"行李箱已经装不下了。<br>剩下的交给我们寄回家。",
+ lede:"把秋叶原买的东西交给我们。我们帮你填报关资料、代为保管，再寄到你家门口。",
+ how_h:"服务流程",
+ s1t:"先给我们发消息", s1b:"告诉我们寄送国家和大概数量，我们回复确定金额。",
+ s2t:"把东西交给我们", s2b:"在秋叶原面交，或从酒店寄给我们。我们会逐一确认并重新包装。",
+ s3t:"报关手续由我们处理", s3b:"日本邮局已不接受手写报关单，线上系统只有日文。我们以你的名义正确填写。",
+ s4t:"自己决定寄出日", s4b:"东西放我们这里，你可以轻装继续玩。想寄时告诉我们，寄出后提供追踪号。",
+ why_h:"为什么不自己寄",
+ w1:"手写报关单已全面停用，必须通过日本邮局的线上系统，而该系统只有日文界面。",
+ w2:"寄往美国的包裹现在必须先用另一个App预缴关税，而且只有少数指定邮局才收件。",
+ w3:"品名或申报金额写错，包裹可能被退回，或卡在你自己国家的海关。",
+ w4:"我们每天都从秋叶原寄国际包裹。这是我们的日常工作。",
+ quote_h:"费用试算",
+ q_dest:"寄到哪里？", q_weight:"大概多重？", q_days:"希望我们保管几天",
+ q_est:"预估总金额",
+ btn_wa:"用 WhatsApp 咨询", btn_line:"用 LINE 咨询", btn_mail:"用 Email 咨询",
+ q_note:"仅为预估。实际金额依重新包装后的重量与箱子尺寸而定。邮资照实收，不加价。",
+ tax_h:"请务必先阅读",
+ tax_t:"寄回国的商品无法退税",
+ tax_b:"自2026年11月1日起，日本改为在机场由海关确认你确实带着商品出境后才退还消费税。寄回家的东西出境时不在你身上，因此那些商品无法退税。体积小、单价高的建议自己带；体积大、单价低的建议寄。可以问我们，我们帮你分。",
+ cant_h:"无法寄送的物品",
+ cant_b:"这是邮政与海关的规定。不确定的话，购买前请先问我们。",
+ foot:"东京都公安委员会许可之古物商。包裹以你本人为寄件人名义寄出。我们并非报关业者，也不提供税务咨询。",
+ no:["锂电池（单独）","充电宝","喷雾罐","香水／含酒精","打火机","食品（依国家而异）","仿冒品","无法开箱确认的密封物"]
+},
+ko:{
+ h1:"캐리어가 가득 찼나요?<br>남은 건 저희가 보내드립니다.",
+ lede:"아키하바라에서 산 물건을 맡겨주세요. 통관 서류 작성부터 보관, 집까지 발송을 대행합니다.",
+ how_h:"이용 방법",
+ s1t:"먼저 메시지 주세요", s1b:"배송 국가와 대략적인 양을 알려주시면 확정 금액을 안내해 드립니다.",
+ s2t:"짐을 맡겨주세요", s2b:"아키하바라에서 직접 전달하거나 호텔에서 보내주세요. 하나하나 확인 후 다시 포장합니다.",
+ s3t:"통관 서류는 저희가", s3b:"일본우편은 손으로 쓴 통관 라벨을 더 이상 받지 않으며, 온라인 시스템은 일본어뿐입니다. 고객님 명의로 정확히 작성합니다.",
+ s4t:"발송일은 직접 결정", s4b:"맡겨두고 가볍게 여행하세요. 보낼 때 알려주시면 발송 후 운송장 번호를 드립니다.",
+ why_h:"직접 하기 어려운 이유",
+ w1:"손으로 쓴 통관 라벨은 폐지되었습니다. 일본우편 온라인 시스템을 써야 하는데 일본어로만 되어 있습니다.",
+ w2:"미국행 소포는 별도 앱으로 관세를 미리 내야 하며, 지정된 일부 우체국에서만 접수됩니다.",
+ w3:"품명이나 신고 금액이 틀리면 반송되거나 본국 세관에서 걸립니다.",
+ w4:"저희는 매일 아키하바라에서 국제 배송을 합니다. 특별한 일이 아니라 일상 업무입니다.",
+ quote_h:"예상 요금",
+ q_dest:"어디로 보내시나요?", q_weight:"대략 무게는?", q_days:"보관 희망 일수",
+ q_est:"예상 합계",
+ btn_wa:"WhatsApp으로 문의", btn_line:"LINE으로 문의", btn_mail:"이메일로 문의",
+ q_note:"예상 금액입니다. 재포장 후 실제 무게와 박스 크기에 따라 확정됩니다. 우편 요금은 실비로만 청구합니다.",
+ tax_h:"먼저 확인해 주세요",
+ tax_t:"발송한 물건은 면세 환급을 받을 수 없습니다",
+ tax_b:"2026년 11월 1일부터 일본은 공항에서 세관이 물품 반출을 확인한 후에만 소비세를 환급합니다. 미리 부친 물건은 출국 시 손에 없으므로 환급 대상이 아닙니다. 작고 비싼 것은 직접 들고, 부피가 크고 저렴한 것은 부치는 편이 유리합니다. 물어보시면 나눠 드립니다.",
+ cant_h:"보낼 수 없는 물품",
+ cant_b:"우편·세관 규정입니다. 확실하지 않으면 구매 전에 문의해 주세요.",
+ foot:"도쿄도 공안위원회 허가 고물상. 소포는 고객님 명의의 발송인으로 보내집니다. 관세사가 아니며 세무 상담은 제공하지 않습니다.",
+ no:["리튬 배터리(단독)","보조배터리","스프레이","향수/알코올 함유","라이터","식품(국가별 상이)","위조품","개봉 확인 불가한 밀봉품"]
+},
+ja:{
+ h1:"スーツケースに入りきらない分、<br>ご自宅までお送りします。",
+ lede:"秋葉原で買った荷物をお預かりします。通関書類の作成から保管、ご自宅への発送まで代行します。",
+ how_h:"ご利用の流れ",
+ s1t:"まずご連絡ください", s1b:"送り先の国とおおよその量をお知らせいただければ、確定金額をご案内します。",
+ s2t:"荷物をお預けください", s2b:"秋葉原で直接お渡しいただくか、ホテルからお送りください。中身を確認して梱包し直します。",
+ s3t:"通関書類は当方で作成", s3b:"日本郵便は手書きラベルを受け付けておらず、オンラインシステムは日本語のみです。お客様名義で正確に作成します。",
+ s4t:"発送日はお客様が決定", s4b:"預けたまま身軽に観光できます。発送のご連絡をいただき次第、追跡番号をお伝えします。",
+ why_h:"ご自身で送るのが難しい理由",
+ w1:"手書きの通関ラベルは廃止されました。日本郵便のオンラインシステムが必須ですが、画面は日本語のみです。",
+ w2:"米国宛は専用アプリでの関税前払いが必須で、指定郵便局でしか引き受けてもらえません。",
+ w3:"品名や申告価格を誤ると、返送されたり、ご自身の国の税関で止まったりします。",
+ w4:"当方は毎日、秋葉原から国際発送を行っています。特別な作業ではなく日常業務です。",
+ quote_h:"料金の目安",
+ q_dest:"送り先", q_weight:"おおよその重量", q_days:"お預かり希望日数",
+ q_est:"概算合計",
+ btn_wa:"WhatsAppで相談", btn_line:"LINEで相談", btn_mail:"メールで相談",
+ q_note:"概算です。梱包後の実重量と箱のサイズで確定します。郵送料は実費のみで、上乗せはしません。",
+ tax_h:"必ずお読みください",
+ tax_t:"発送した商品は免税の対象外になります",
+ tax_b:"2026年11月1日以降、日本の消費税還付は、空港で税関が持ち出しを確認した後に行われます。先に発送した商品は出国時に手元にないため、還付を受けられません。小さく高価なものはお手荷物で、かさばって安価なものは発送、という分け方が有利です。ご相談いただければ仕分けをお手伝いします。",
+ cant_h:"お預かりできないもの",
+ cant_b:"郵便・税関の規定によるものです。ご不明な場合は購入前にご相談ください。",
+ foot:"東京都公安委員会許可 古物商。荷物はお客様ご本人を差出人として発送します。通関業者ではなく、税務に関する助言は行いません。",
+ no:["リチウム電池（単体）","モバイルバッテリー","スプレー類","香水・アルコール含有","ライター","食品（国により異なる）","模倣品","開封確認できない密封物"]
+}
+};
+
+var $=function(id){return document.getElementById(id);};
+var lang="en";
+
+function applyLang(L){
+  lang=L;
+  var t=I18N[L];
+  document.documentElement.lang = L;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){
+    var k=el.getAttribute("data-i18n");
+    if(t[k]!==undefined) el.innerHTML=t[k];
+  });
+  $("noList").innerHTML = t.no.map(function(x){return "<span>"+x+"</span>";}).join("");
+  $("bizName").textContent = CONFIG.bizName;
+  document.querySelectorAll("#langs button").forEach(function(b){
+    b.setAttribute("aria-pressed", b.getAttribute("data-lang")===L);
+  });
+  calc();
+}
+
+document.querySelectorAll("#langs button").forEach(function(b){
+  b.onclick=function(){ applyLang(b.getAttribute("data-lang")); window.scrollTo(0,0); };
+});
+
+function postage(zone, wt){
+  var p=CONFIG.post[zone][wt];
+  if(p) return {yen:p, svc:"Air Packet"};
+  var e=CONFIG.ems[zone] && CONFIG.ems[zone][wt];
+  return e? {yen:e, svc:"EMS"} : null;
+}
+
+function calc(){
+  var zone=+$("dest").value, wt=+$("wt").value, days=+$("days").value;
+  var po=postage(zone,wt);
+  var storage = Math.max(0, days-CONFIG.freeDays)*CONFIG.perDay;
+  if(!po){ $("estVal").textContent="—"; return; }
+  var total = CONFIG.handling + storage + po.yen;
+  $("estVal").textContent = "¥"+total.toLocaleString();
+  var parts = [
+    "Handling ¥"+CONFIG.handling.toLocaleString(),
+    po.svc+" ¥"+po.yen.toLocaleString(),
+    storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-CONFIG.freeDays)+"d)"
+              : "Storage free ("+CONFIG.freeDays+"d incl.)"
+  ];
+  $("estSub").textContent = parts.join("  ·  ");
+  buildLinks(total, po);
+}
+
+function buildLinks(total, po){
+  var destTxt=$("dest").options[$("dest").selectedIndex].text;
+  var wtTxt=$("wt").options[$("wt").selectedIndex].text;
+  var days=$("days").value;
+  var msg = "Hello! I'd like a quote.\n"
+          + "Destination: "+destTxt+"\n"
+          + "Weight: "+wtTxt+"\n"
+          + "Hold for: "+days+" days\n"
+          + "Estimate shown: ¥"+total.toLocaleString()+" ("+po.svc+")";
+  var enc=encodeURIComponent(msg);
+  $("btnWa").href  = "https://wa.me/"+CONFIG.whatsapp+"?text="+enc;
+  $("btnLine").href= "https://line.me/R/ti/p/@"+CONFIG.lineId;
+  $("btnMail").href= "mailto:"+CONFIG.email+"?subject="+encodeURIComponent("Shipping quote request")+"&body="+enc;
+}
+
+["dest","wt","days"].forEach(function(id){ $(id).addEventListener("change", calc); });
+
+/* 端末の言語で初期表示を切り替え */
+(function(){
+  var n=(navigator.language||"en").toLowerCase();
+  var pick="en";
+  if(n.indexOf("zh")===0) pick = (n.indexOf("cn")>-1||n.indexOf("hans")>-1) ? "zh-Hans" : "zh-Hant";
+  else if(n.indexOf("ko")===0) pick="ko";
+  else if(n.indexOf("ja")===0) pick="ja";
+  applyLang(pick);
+})();
+</script>
+</body>
+</html>
