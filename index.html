@@ -160,7 +160,7 @@ footer b{color:#e7e3da}
         <option value="1000" selected>～1 kg</option>
         <option value="2000">～2 kg</option>
         <option value="3000">～3 kg</option>
-        <option value="5000">～5 kg</option>
+        <option value="4000">～4 kg</option>
       </select>
 
       <label class="f" data-i18n="q_pack"></label>
@@ -231,7 +231,7 @@ var CONFIG = {
   // 梱包の選択肢（材料費と、梱包で増える重量）
   packing: {
     box: { cost:150, addWeight:200 },   // 段ボール箱
-    env: { cost: 50, addWeight: 30 }    // クッション封筒
+    env: { cost: 50, addWeight: 30, maxGrams: 2000 }  // クッション封筒（2kgまで）
   },
   freeDays: 3,      // 無料保管日数
   perDay:   200,    // 無料日数を超えた1日あたりの保管料
@@ -256,6 +256,8 @@ var CONFIG = {
 
 var I18N = {
 en:{
+ pack_over:"Over 5 kg — please message us for a quote.",
+ pack_heavy:"Over 2 kg we always use a box — an envelope cannot protect a parcel this heavy.",
  q_pack:"How should we pack it?",
  pack_box:"Box — recommended for figures & anything fragile",
  pack_env:"Padded envelope — clothes, plush, books, flat items",
@@ -286,6 +288,8 @@ en:{
  no:["Lithium batteries (loose)","Power banks","Aerosols","Perfume / alcohol-based","Lighters","Food (varies by country)","Counterfeit goods","Anything sealed we cannot inspect"]
 },
 "zh-Hant":{
+ pack_over:"超過5公斤請直接詢問報價。",
+ pack_heavy:"超過2公斤一律使用紙箱。氣泡袋無法保護這麼重的包裹。",
  q_pack:"包裝方式",
  pack_box:"紙箱 — 建議公仔、盒裝品、易碎品使用",
  pack_env:"氣泡袋 — 衣物、絨毛玩偶、書籍、扁平物品",
@@ -316,6 +320,8 @@ en:{
  no:["鋰電池（單獨）","行動電源","噴霧罐","香水／含酒精","打火機","食品（依國家而異）","仿冒品","無法開箱確認的密封物"]
 },
 "zh-Hans":{
+ pack_over:"超过5公斤请直接询问报价。",
+ pack_heavy:"超过2公斤一律使用纸箱。气泡袋无法保护这么重的包裹。",
  q_pack:"包装方式",
  pack_box:"纸箱 — 建议手办、盒装品、易碎品使用",
  pack_env:"气泡袋 — 衣物、毛绒玩具、书籍、扁平物品",
@@ -346,6 +352,8 @@ en:{
  no:["锂电池（单独）","充电宝","喷雾罐","香水／含酒精","打火机","食品（依国家而异）","仿冒品","无法开箱确认的密封物"]
 },
 ko:{
+ pack_over:"5kg 초과는 문의해 주세요.",
+ pack_heavy:"2kg을 넘으면 반드시 박스를 사용합니다. 봉투로는 이 무게를 보호할 수 없습니다.",
  q_pack:"포장 방법",
  pack_box:"박스 — 피규어·박스 상품·깨지기 쉬운 물건에 권장",
  pack_env:"안전봉투 — 의류, 인형, 책, 납작한 물건",
@@ -376,6 +384,8 @@ ko:{
  no:["리튬 배터리(단독)","보조배터리","스프레이","향수/알코올 함유","라이터","식품(국가별 상이)","위조품","개봉 확인 불가한 밀봉품"]
 },
 ja:{
+ pack_over:"5kg超はお問い合わせください。",
+ pack_heavy:"2kgを超える荷物は段ボール固定です。封筒ではこの重さを保護できません。",
  q_pack:"梱包方法",
  pack_box:"段ボール箱 — フィギュア・箱物・壊れやすいものに推奨",
  pack_env:"クッション封筒 — 衣類・ぬいぐるみ・書籍・薄いもの",
@@ -422,7 +432,6 @@ function applyLang(L){
     var k=el.getAttribute("data-i18n-opt");
     if(t[k]!==undefined) el.textContent=t[k];
   });
-  $("packNote").textContent = t.pack_note;
   $("noList").innerHTML = t.no.map(function(x){return "<span>"+x+"</span>";}).join("");
   $("bizName").textContent = CONFIG.bizName;
   document.querySelectorAll("#langs button").forEach(function(b){
@@ -449,13 +458,24 @@ function postage(zone, grams){
 
 function calc(){
   var zone=+$("dest").value, wtSel=+$("wt").value, days=+$("days").value;
+
+  // 2kgを超える荷物は封筒不可 → 箱に固定する
+  var envOpt = document.querySelector('[data-i18n-opt="pack_env"]');
+  var envTooHeavy = (wtSel + CONFIG.packing.env.addWeight) > CONFIG.packing.env.maxGrams;
+  envOpt.disabled = envTooHeavy;
+  if(envTooHeavy && $("packing").value === "env") $("packing").value = "box";
+
   var pk = CONFIG.packing[$("packing").value];
 
   // 梱包で増える重量を足して実重量で計算
   var billable = wtSel + pk.addWeight;
   var po = postage(zone, billable);
   var storage = Math.max(0, days-CONFIG.freeDays)*CONFIG.perDay;
-  if(!po){ $("estVal").textContent="—"; $("estSub").textContent=""; return; }
+  if(!po){
+    $("estVal").textContent="—";
+    $("estSub").textContent = (I18N[lang].pack_over || I18N.en.pack_over);
+    return;
+  }
 
   var total = CONFIG.handling + pk.cost + storage + po.yen;
   $("estVal").textContent = "¥"+total.toLocaleString();
@@ -468,11 +488,14 @@ function calc(){
               : "Storage free ("+CONFIG.freeDays+"d incl.)"
   ];
   $("estSub").textContent = parts.join("  ·  ");
+  $("packNote").textContent = envTooHeavy
+    ? (I18N[lang].pack_heavy || I18N.en.pack_heavy)
+    : I18N[lang].pack_note;
 
-  // もう一方の梱包との差額を出す
+  // もう一方の梱包との差額を出す（封筒が使える重量のときだけ）
   var otherKey = $("packing").value==="box" ? "env" : "box";
   var ok2 = CONFIG.packing[otherKey];
-  var po2 = postage(zone, wtSel + ok2.addWeight);
+  var po2 = envTooHeavy ? null : postage(zone, wtSel + ok2.addWeight);
   if(po2){
     var t2 = CONFIG.handling + ok2.cost + storage + po2.yen;
     var d = total - t2;
