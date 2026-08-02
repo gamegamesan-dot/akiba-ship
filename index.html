@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Send It Home — Akihabara Shipping Desk</title>
-<meta name="description" content="Bought too much in Akihabara? We create the customs label, hold your parcel, and ship it home for you.">
+<title>Omakase Ship — Travel Japan hands-free</title>
+<meta name="description" content="Just send a screenshot. We create the customs label, hold your parcel, and ship it to your hotel or your home country.">
 <meta name="theme-color" content="#16181d">
 <style>
 :root{
@@ -28,6 +28,10 @@ body{margin:0;background:var(--paper);color:var(--ink);
   background:transparent;color:#9aa0aa;font-family:inherit;white-space:nowrap}
 .langs button[aria-pressed=true]{background:var(--paper);color:var(--ink)}
 
+
+.brand{margin-bottom:14px}
+.brand .bmain{display:block;font-size:20px;font-weight:800;letter-spacing:.06em;color:#fff;line-height:1.1}
+.brand .bsub{display:block;font-size:11px;letter-spacing:.14em;color:#8f96a3;margin-top:3px}
 /* hero */
 header{background:var(--ink);color:#f2efe8;padding:22px 0 30px;position:relative;overflow:hidden}
 header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;
@@ -101,6 +105,10 @@ footer b{color:#e7e3da}
 
 <header>
   <div class="wrap">
+    <div class="brand">
+      <span class="bmain">OMAKASE SHIP</span>
+      <span class="bsub">by Play Japan</span>
+    </div>
     <div class="kicker">AKIHABARA · TOKYO</div>
     <h1 data-i18n="h1"></h1>
     <p class="lede" data-i18n="lede"></p>
@@ -155,6 +163,13 @@ footer b{color:#e7e3da}
         <option value="5000">～5 kg</option>
       </select>
 
+      <label class="f" data-i18n="q_pack"></label>
+      <select id="packing">
+        <option value="box" selected data-i18n-opt="pack_box"></option>
+        <option value="env" data-i18n-opt="pack_env"></option>
+      </select>
+      <p class="small" id="packNote" style="margin:6px 0 0"></p>
+
       <label class="f" data-i18n="q_days"></label>
       <select id="days">
         <option value="0" selected>0</option>
@@ -196,7 +211,7 @@ footer b{color:#e7e3da}
 
 <footer>
   <div class="wrap">
-    <div style="margin-bottom:8px"><b id="bizName">Ocean Trading Co., Ltd.</b></div>
+    <div style="margin-bottom:8px"><b id="bizName">Omakase Ship by Play Japan</b></div>
     <div data-i18n="foot"></div>
   </div>
 </footer>
@@ -206,31 +221,45 @@ footer b{color:#e7e3da}
    設定 — ここだけ書き換えれば全部反映されます
    ============================================================ */
 var CONFIG = {
-  bizName:  "Ocean Trading Co., Ltd. / 有限会社オーシャン貿易",
+  bizName:  "Omakase Ship by Play Japan",
   whatsapp: "819000000000",              // 国番号81 + 先頭0を除いた番号
   lineId:   "your-line-id",              // LINE公式アカウントID（@は除く）
   email:    "hello@example.com",
 
   handling: 1800,   // 1個あたりの取扱手数料（ラベル作成・申告・持込）
+
+  // 梱包の選択肢（材料費と、梱包で増える重量）
+  packing: {
+    box: { cost:150, addWeight:200 },   // 段ボール箱
+    env: { cost: 50, addWeight: 30 }    // クッション封筒
+  },
   freeDays: 3,      // 無料保管日数
   perDay:   200,    // 無料日数を超えた1日あたりの保管料
 
-  // 国際エアパケット実費（円）— 日本郵便 2026年7月時点
-  post: {
-    1:{500:1120,1000:1620,2000:2620,3000:null,5000:null},
-    2:{500:1230,1000:1830,2000:3030,3000:null,5000:null},
-    3:{500:1600,1000:2500,2000:4300,3000:null,5000:null},
-    4:{500:2040,1000:3090,2000:5190,3000:null,5000:null}
+  // 国際エアパケット実費（円）— 日本郵便 2026年7月・100g刻み・2kgまで
+  // 添字 = 100g単位（0=〜100g, 9=〜1000g, 19=〜2000g）
+  airRates: {
+    1: [720,820,920,1020,1120,1220,1320,1420,1520,1620,1720,1820,1920,2020,2120,2220,2320,2420,2520,2620],
+    2: [750,870,990,1110,1230,1350,1470,1590,1710,1830,1950,2070,2190,2310,2430,2550,2670,2790,2910,3030],
+    3: [880,1060,1240,1420,1600,1780,1960,2140,2320,2500,2680,2860,3040,3220,3400,3580,3760,3940,4120,4300],
+    4: [1200,1410,1620,1830,2040,2250,2460,2670,2880,3090,3300,3510,3720,3930,4140,4350,4560,4770,4980,5190]
   },
   // 2kg超はEMS実費（円）
-  ems: {
-    1:{3000:4400,5000:6400}, 2:{3000:5750,5000:8150},
-    3:{3000:8800,5000:13000}, 4:{3000:10300,5000:15100}
+  emsSteps: [2000,2500,3000,3500,4000,4500,5000],
+  emsRates: {
+    1: [3400,3900,4400,4900,5400,5900,6400],
+    2: [4550,5150,5750,6350,6950,7550,8150],
+    3: [6700,7750,8800,9850,10900,11950,13000],
+    4: [7900,9100,10300,11500,12700,13900,15100]
   }
 };
 
 var I18N = {
 en:{
+ q_pack:"How should we pack it?",
+ pack_box:"Box — recommended for figures & anything fragile",
+ pack_env:"Padded envelope — clothes, plush, books, flat items",
+ pack_note:"A box protects better but adds about 200 g, which raises the postage. An envelope is lighter and cheaper, but is not suitable for boxed figures or fragile items. Damage to items sent in an envelope is not covered.",
  h1:"Your suitcase is full.<br>We'll send the rest home.",
  lede:"Drop your Akihabara haul with us. We write the customs paperwork, hold it as long as you need, and post it to your door.",
  how_h:"How it works",
@@ -253,10 +282,14 @@ en:{
  tax_b:"From 1 November 2026 Japan refunds consumption tax only after customs confirms you are carrying the goods out at the airport. Anything you post home will not be with you at departure, so no refund on those items. Small or expensive things are usually worth carrying yourself; bulky, cheaper things are usually worth shipping. Ask us and we'll help you split it.",
  cant_h:"What we cannot ship",
  cant_b:"Postal and customs rules, not ours. If you are unsure, ask before you buy.",
- foot:"Licensed second-hand dealer registered in Tokyo. Parcels are sent in your name as the sender. We are not a customs broker and do not provide tax advice.",
+ foot:"Operated by Ocean Trading Co., Ltd., a licensed second-hand dealer registered in Tokyo. Licensed second-hand dealer registered in Tokyo. Parcels are sent in your name as the sender. We are not a customs broker and do not provide tax advice.",
  no:["Lithium batteries (loose)","Power banks","Aerosols","Perfume / alcohol-based","Lighters","Food (varies by country)","Counterfeit goods","Anything sealed we cannot inspect"]
 },
 "zh-Hant":{
+ q_pack:"包裝方式",
+ pack_box:"紙箱 — 建議公仔、盒裝品、易碎品使用",
+ pack_env:"氣泡袋 — 衣物、絨毛玩偶、書籍、扁平物品",
+ pack_note:"紙箱保護性較好，但會增加約200公克，運費也隨之提高。氣泡袋較輕較便宜，但不適合盒裝公仔或易碎品。使用氣泡袋寄送的物品，破損不在補償範圍內。",
  h1:"行李箱已經塞不下了。<br>剩下的交給我們寄回家。",
  lede:"把秋葉原買的東西交給我們。我們幫你填報關資料、代為保管，再寄到你家門口。",
  how_h:"服務流程",
@@ -279,10 +312,14 @@ en:{
  tax_b:"自2026年11月1日起，日本改為在機場由海關確認你確實帶著商品出境後才退還消費稅。寄回家的東西出境時不在你身上，因此那些商品無法退稅。體積小、單價高的建議自己帶；體積大、單價低的建議寄。可以問我們，我們幫你分。",
  cant_h:"無法寄送的物品",
  cant_b:"這是郵政與海關的規定。不確定的話，購買前請先問我們。",
- foot:"東京都公安委員會許可之古物商。包裹以你本人為寄件人名義寄出。我們並非報關業者，也不提供稅務諮詢。",
+ foot:"由東京都公安委員會許可之古物商 有限会社オーシャン貿易 營運。東京都公安委員會許可之古物商。包裹以你本人為寄件人名義寄出。我們並非報關業者，也不提供稅務諮詢。",
  no:["鋰電池（單獨）","行動電源","噴霧罐","香水／含酒精","打火機","食品（依國家而異）","仿冒品","無法開箱確認的密封物"]
 },
 "zh-Hans":{
+ q_pack:"包装方式",
+ pack_box:"纸箱 — 建议手办、盒装品、易碎品使用",
+ pack_env:"气泡袋 — 衣物、毛绒玩具、书籍、扁平物品",
+ pack_note:"纸箱保护性更好，但会增加约200克，运费也随之提高。气泡袋更轻更便宜，但不适合盒装手办或易碎品。使用气泡袋寄送的物品，破损不在补偿范围内。",
  h1:"行李箱已经装不下了。<br>剩下的交给我们寄回家。",
  lede:"把秋叶原买的东西交给我们。我们帮你填报关资料、代为保管，再寄到你家门口。",
  how_h:"服务流程",
@@ -305,10 +342,14 @@ en:{
  tax_b:"自2026年11月1日起，日本改为在机场由海关确认你确实带着商品出境后才退还消费税。寄回家的东西出境时不在你身上，因此那些商品无法退税。体积小、单价高的建议自己带；体积大、单价低的建议寄。可以问我们，我们帮你分。",
  cant_h:"无法寄送的物品",
  cant_b:"这是邮政与海关的规定。不确定的话，购买前请先问我们。",
- foot:"东京都公安委员会许可之古物商。包裹以你本人为寄件人名义寄出。我们并非报关业者，也不提供税务咨询。",
+ foot:"由东京都公安委员会许可之古物商 有限会社オーシャン貿易 运营。东京都公安委员会许可之古物商。包裹以你本人为寄件人名义寄出。我们并非报关业者，也不提供税务咨询。",
  no:["锂电池（单独）","充电宝","喷雾罐","香水／含酒精","打火机","食品（依国家而异）","仿冒品","无法开箱确认的密封物"]
 },
 ko:{
+ q_pack:"포장 방법",
+ pack_box:"박스 — 피규어·박스 상품·깨지기 쉬운 물건에 권장",
+ pack_env:"안전봉투 — 의류, 인형, 책, 납작한 물건",
+ pack_note:"박스는 보호력이 좋지만 약 200g이 늘어나 우편 요금이 올라갑니다. 봉투는 가볍고 저렴하지만 박스 피규어나 깨지기 쉬운 물건에는 적합하지 않습니다. 봉투로 보낸 물품의 파손은 보상 대상이 아닙니다.",
  h1:"캐리어가 가득 찼나요?<br>남은 건 저희가 보내드립니다.",
  lede:"아키하바라에서 산 물건을 맡겨주세요. 통관 서류 작성부터 보관, 집까지 발송을 대행합니다.",
  how_h:"이용 방법",
@@ -331,10 +372,14 @@ ko:{
  tax_b:"2026년 11월 1일부터 일본은 공항에서 세관이 물품 반출을 확인한 후에만 소비세를 환급합니다. 미리 부친 물건은 출국 시 손에 없으므로 환급 대상이 아닙니다. 작고 비싼 것은 직접 들고, 부피가 크고 저렴한 것은 부치는 편이 유리합니다. 물어보시면 나눠 드립니다.",
  cant_h:"보낼 수 없는 물품",
  cant_b:"우편·세관 규정입니다. 확실하지 않으면 구매 전에 문의해 주세요.",
- foot:"도쿄도 공안위원회 허가 고물상. 소포는 고객님 명의의 발송인으로 보내집니다. 관세사가 아니며 세무 상담은 제공하지 않습니다.",
+ foot:"도쿄도 공안위원회 허가 고물상 有限会社オーシャン貿易 가 운영합니다. 도쿄도 공안위원회 허가 고물상. 소포는 고객님 명의의 발송인으로 보내집니다. 관세사가 아니며 세무 상담은 제공하지 않습니다.",
  no:["리튬 배터리(단독)","보조배터리","스프레이","향수/알코올 함유","라이터","식품(국가별 상이)","위조품","개봉 확인 불가한 밀봉품"]
 },
 ja:{
+ q_pack:"梱包方法",
+ pack_box:"段ボール箱 — フィギュア・箱物・壊れやすいものに推奨",
+ pack_env:"クッション封筒 — 衣類・ぬいぐるみ・書籍・薄いもの",
+ pack_note:"段ボールは保護力が高い一方、約200g重くなり送料が上がります。封筒は軽く安価ですが、箱入りフィギュアや壊れやすいものには向きません。封筒で発送した商品の破損は補償対象外です。",
  h1:"スーツケースに入りきらない分、<br>ご自宅までお送りします。",
  lede:"秋葉原で買った荷物をお預かりします。通関書類の作成から保管、ご自宅への発送まで代行します。",
  how_h:"ご利用の流れ",
@@ -357,7 +402,7 @@ ja:{
  tax_b:"2026年11月1日以降、日本の消費税還付は、空港で税関が持ち出しを確認した後に行われます。先に発送した商品は出国時に手元にないため、還付を受けられません。小さく高価なものはお手荷物で、かさばって安価なものは発送、という分け方が有利です。ご相談いただければ仕分けをお手伝いします。",
  cant_h:"お預かりできないもの",
  cant_b:"郵便・税関の規定によるものです。ご不明な場合は購入前にご相談ください。",
- foot:"東京都公安委員会許可 古物商。荷物はお客様ご本人を差出人として発送します。通関業者ではなく、税務に関する助言は行いません。",
+ foot:"運営：有限会社オーシャン貿易（東京都公安委員会許可 古物商）。荷物はお客様ご本人を差出人として発送します。通関業者ではなく、税務に関する助言は行いません。",
  no:["リチウム電池（単体）","モバイルバッテリー","スプレー類","香水・アルコール含有","ライター","食品（国により異なる）","模倣品","開封確認できない密封物"]
 }
 };
@@ -373,6 +418,11 @@ function applyLang(L){
     var k=el.getAttribute("data-i18n");
     if(t[k]!==undefined) el.innerHTML=t[k];
   });
+  document.querySelectorAll("[data-i18n-opt]").forEach(function(el){
+    var k=el.getAttribute("data-i18n-opt");
+    if(t[k]!==undefined) el.textContent=t[k];
+  });
+  $("packNote").textContent = t.pack_note;
   $("noList").innerHTML = t.no.map(function(x){return "<span>"+x+"</span>";}).join("");
   $("bizName").textContent = CONFIG.bizName;
   document.querySelectorAll("#langs button").forEach(function(b){
@@ -385,46 +435,75 @@ document.querySelectorAll("#langs button").forEach(function(b){
   b.onclick=function(){ applyLang(b.getAttribute("data-lang")); window.scrollTo(0,0); };
 });
 
-function postage(zone, wt){
-  var p=CONFIG.post[zone][wt];
-  if(p) return {yen:p, svc:"Air Packet"};
-  var e=CONFIG.ems[zone] && CONFIG.ems[zone][wt];
-  return e? {yen:e, svc:"EMS"} : null;
+function postage(zone, grams){
+  if(grams<=0) return null;
+  if(grams<=2000){
+    var i = Math.ceil(grams/100)-1;
+    return { yen: CONFIG.airRates[zone][i], svc:"Air Packet" };
+  }
+  for(var k=0;k<CONFIG.emsSteps.length;k++){
+    if(grams<=CONFIG.emsSteps[k]) return { yen: CONFIG.emsRates[zone][k], svc:"EMS" };
+  }
+  return null;
 }
 
 function calc(){
-  var zone=+$("dest").value, wt=+$("wt").value, days=+$("days").value;
-  var po=postage(zone,wt);
+  var zone=+$("dest").value, wtSel=+$("wt").value, days=+$("days").value;
+  var pk = CONFIG.packing[$("packing").value];
+
+  // 梱包で増える重量を足して実重量で計算
+  var billable = wtSel + pk.addWeight;
+  var po = postage(zone, billable);
   var storage = Math.max(0, days-CONFIG.freeDays)*CONFIG.perDay;
-  if(!po){ $("estVal").textContent="—"; return; }
-  var total = CONFIG.handling + storage + po.yen;
+  if(!po){ $("estVal").textContent="—"; $("estSub").textContent=""; return; }
+
+  var total = CONFIG.handling + pk.cost + storage + po.yen;
   $("estVal").textContent = "¥"+total.toLocaleString();
+
   var parts = [
     "Handling ¥"+CONFIG.handling.toLocaleString(),
-    po.svc+" ¥"+po.yen.toLocaleString(),
+    "Packing ¥"+pk.cost.toLocaleString(),
+    po.svc+" ¥"+po.yen.toLocaleString()+" ("+billable+"g)",
     storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-CONFIG.freeDays)+"d)"
               : "Storage free ("+CONFIG.freeDays+"d incl.)"
   ];
   $("estSub").textContent = parts.join("  ·  ");
-  buildLinks(total, po);
+
+  // もう一方の梱包との差額を出す
+  var otherKey = $("packing").value==="box" ? "env" : "box";
+  var ok2 = CONFIG.packing[otherKey];
+  var po2 = postage(zone, wtSel + ok2.addWeight);
+  if(po2){
+    var t2 = CONFIG.handling + ok2.cost + storage + po2.yen;
+    var d = total - t2;
+    if(d !== 0){
+      $("estSub").textContent += "  ·  " +
+        (otherKey==="env" ? "Envelope" : "Box") + " " +
+        (d>0 ? "−¥"+Math.abs(d).toLocaleString() : "+¥"+Math.abs(d).toLocaleString());
+    }
+  }
+  buildLinks(total, po, billable);
 }
 
-function buildLinks(total, po){
+
+function buildLinks(total, po, billable){
   var destTxt=$("dest").options[$("dest").selectedIndex].text;
   var wtTxt=$("wt").options[$("wt").selectedIndex].text;
+  var packTxt=$("packing").value==="box" ? "Box" : "Padded envelope";
   var days=$("days").value;
   var msg = "Hello! I'd like a quote.\n"
           + "Destination: "+destTxt+"\n"
           + "Weight: "+wtTxt+"\n"
+          + "Packing: "+packTxt+"\n"
           + "Hold for: "+days+" days\n"
-          + "Estimate shown: ¥"+total.toLocaleString()+" ("+po.svc+")";
+          + "Estimate shown: ¥"+total.toLocaleString()+" ("+po.svc+", billed at "+billable+"g)";
   var enc=encodeURIComponent(msg);
   $("btnWa").href  = "https://wa.me/"+CONFIG.whatsapp+"?text="+enc;
   $("btnLine").href= "https://line.me/R/ti/p/@"+CONFIG.lineId;
   $("btnMail").href= "mailto:"+CONFIG.email+"?subject="+encodeURIComponent("Shipping quote request")+"&body="+enc;
 }
 
-["dest","wt","days"].forEach(function(id){ $(id).addEventListener("change", calc); });
+["dest","wt","days","packing"].forEach(function(id){ $(id).addEventListener("change", calc); });
 
 /* 端末の言語で初期表示を切り替え */
 (function(){

@@ -1,6 +1,8 @@
-# Akihabara Shipping Desk — ランディングページ
+# Omakase Ship by Play Japan — ランディングページ / チラシ
 
-インバウンド向け国際発送代行サービスの検証用ランディングページ(Phase 0)。
+インバウンド向け国際発送代行サービス「Omakase Ship by Play Japan」の検証用一式(Phase 0)。
+
+コンセプト: 手ぶらで日本を楽しんで、住所のスクショだけでホテルや自国へ国際発送。
 スマホでQRを読ませることを前提に、モバイル優先で作っています。
 
 ## ファイル
@@ -9,6 +11,10 @@
 |---|---|
 | `index.html` | ランディングページ本体(5言語) |
 | `qr_print.png` | チラシ・POP印刷用(940×1024px) |
+| `flyer_a6_2side.pdf` | A6両面チラシ(105×148mm・2ページ) |
+| `flyer2_side1_print.png` | チラシ表面 350dpi |
+| `flyer2_side2_print.png` | チラシ裏面 350dpi |
+| `make_flyer2.py` | チラシ再生成スクリプト |
 | `qr_web.png` | SNS・画面表示用(376×409px) |
 | `make_qr.py` | QR再生成スクリプト |
 
@@ -18,7 +24,7 @@
 
 ```js
 var CONFIG = {
-  bizName:  "Ocean Trading Co., Ltd. / 有限会社オーシャン貿易",
+  bizName:  "Omakase Ship by Play Japan",
   whatsapp: "819000000000",   // ← 国番号81 + 先頭0を除いた番号
   lineId:   "your-line-id",   // ← LINE公式アカウントID(@は除く)
   email:    "hello@example.com",
