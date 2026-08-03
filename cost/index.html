@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How Much Does It Cost to Ship from Japan? | Real Rates Calculator — Omakase Ship</title>
+<meta name="description" content="Actual Japan Post rates to ship a parcel from Japan to the USA, Europe, Asia and beyond. Enter the weight, see the price and delivery time. Updated July 2026.">
+<link rel="canonical" href="https://gamegamesan-dot.github.io/akiba-ship/cost/">
+<meta property="og:title" content="How much does it cost to ship from Japan?">
+<meta property="og:description" content="Real Japan Post rates. Enter the weight, get the price and the delivery time.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1F4F8;
+  --panel:#FFFFFF;
+  --ink:#0E1626;
+  --ink-2:#4A576C;
+  --rule:#C7D1E0;
+  --air-red:#C8352C;
+  --air-blue:#1D4E9C;
+  --stamp:#E4EAF3;
+  --ok:#1B6B4A;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:'Archivo',system-ui,sans-serif;
+  font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'Space Mono',ui-monospace,monospace}
+.wrap{max-width:640px;margin:0 auto;padding:0 20px}
+
+/* ---- airmail stripe ---- */
+.airmail{
+  height:9px;
+  background:repeating-linear-gradient(
+    -45deg,
+    var(--air-red) 0 14px,
+    var(--paper) 14px 26px,
+    var(--air-blue) 26px 40px,
+    var(--paper) 40px 52px
+  );
+  background-size:200% 100%;
+  animation:slide 1.1s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes slide{from{background-position:60% 0;opacity:0}to{background-position:0 0;opacity:1}}
+
+header{padding:16px 0 0}
+.brand{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+}
+.brand b{color:var(--ink);font-weight:700;letter-spacing:.2em}
+
+h1{
+  font-weight:900;
+  font-size:clamp(34px,9.5vw,54px);
+  line-height:.95;
+  letter-spacing:-.025em;
+  text-transform:uppercase;
+  margin:22px 0 14px;
+}
+h1 em{font-style:normal;color:var(--air-red)}
+.lede{font-size:17px;color:var(--ink-2);margin:0 0 8px;max-width:34em}
+
+/* ---- calculator ---- */
+.calc{
+  background:var(--panel);
+  border:1px solid var(--rule);
+  border-radius:2px;
+  margin:26px 0;
+  box-shadow:0 1px 0 rgba(14,22,38,.05);
+}
+.calc-head{
+  border-bottom:1px dashed var(--rule);
+  padding:12px 18px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2);
+}
+.calc-body{padding:20px 18px}
+
+.field{margin-bottom:20px}
+.field > label{
+  display:block;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-2);margin-bottom:7px;
+}
+select{
+  width:100%;padding:12px 13px;
+  font-family:'Archivo',sans-serif;font-size:16px;font-weight:500;color:var(--ink);
+  background:var(--stamp);border:1px solid var(--rule);border-radius:2px;
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='11' height='7' fill='none'><path d='M1 1l4.5 4.5L10 1' stroke='%234A576C' stroke-width='1.6'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+.wt-row{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.wt-val{font-size:34px;font-weight:700;letter-spacing:-.02em}
+.wt-unit{font-size:13px;color:var(--ink-2);letter-spacing:.1em}
+input[type=range]{
+  width:100%;margin:0;appearance:none;background:transparent;height:26px;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:3px;background:var(--rule);border-radius:2px;
+}
+input[type=range]::-webkit-slider-thumb{
+  appearance:none;width:26px;height:26px;margin-top:-11.5px;
+  background:var(--air-red);border-radius:50%;border:3px solid #fff;
+  box-shadow:0 1px 4px rgba(14,22,38,.3);cursor:pointer;
+}
+input[type=range]::-moz-range-track{height:3px;background:var(--rule);border-radius:2px}
+input[type=range]::-moz-range-thumb{
+  width:20px;height:20px;background:var(--air-red);border-radius:50%;
+  border:3px solid #fff;box-shadow:0 1px 4px rgba(14,22,38,.3);cursor:pointer;
+}
+input[type=range]:focus-visible,select:focus-visible,a:focus-visible{
+  outline:2px solid var(--air-blue);outline-offset:3px;
+}
+
+/* ---- the staircase (signature) ---- */
+.stair-wrap{
+  background:var(--stamp);border:1px solid var(--rule);border-radius:2px;
+  padding:14px 14px 12px;margin-bottom:20px;
+}
+.stair-label{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-2);margin-bottom:11px;
+}
+.stair{display:flex;align-items:flex-end;gap:3px;height:62px}
+.step{
+  flex:1;background:#C2CEDF;border-radius:1px 1px 0 0;
+  transition:background .18s ease,transform .18s ease;
+  position:relative;
+}
+.step.here{background:var(--air-red)}
+.step.past{background:#9FB0C8}
+.stair-note{
+  margin-top:11px;font-size:13px;line-height:1.45;color:var(--ink-2);
+}
+.stair-note b{color:var(--ink);font-weight:600}
+.stair-note .good{color:var(--ok);font-weight:600}
+
+/* ---- result ---- */
+.result{border-top:1px solid var(--rule);padding-top:16px}
+.line{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0}
+.line .k{font-size:14px;color:var(--ink-2)}
+.line .v{font-size:17px;font-weight:600}
+.line.total{
+  border-top:1px solid var(--ink);margin-top:10px;padding-top:14px;align-items:flex-start;
+}
+.line.total .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);font-weight:600}
+.line.total .v{font-size:38px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.sub{font-size:12px;color:var(--ink-2);margin-top:6px}
+.eta{
+  display:inline-block;margin-top:14px;padding:5px 11px;
+  background:var(--stamp);border:1px solid var(--rule);border-radius:2px;
+  font-size:12px;letter-spacing:.06em;
+}
+.svc{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--air-blue)}
+
+/* ---- content ---- */
+h2{
+  font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:600;
+  margin:44px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--rule);
+}
+h3{font-size:17px;font-weight:600;margin:22px 0 5px}
+p{margin:0 0 13px;color:var(--ink-2)}
+p.b{color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px}
+th,td{padding:9px 6px;text-align:right;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+th{
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:600;
+}
+td.n{font-family:'Space Mono',monospace;font-variant-numeric:tabular-nums}
+caption{
+  caption-side:bottom;font-size:12px;color:var(--ink-2);
+  text-align:left;padding-top:9px;
+}
+
+.cta{
+  display:block;margin:34px 0 10px;padding:20px 22px;
+  background:var(--ink);color:#fff;text-decoration:none;border-radius:2px;
+  transition:transform .16s ease;
+}
+.cta:hover{transform:translateY(-2px)}
+.cta .kicker{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:#8FA4C4;display:block;margin-bottom:6px;
+}
+.cta .big{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:block}
+.cta .small{font-size:13px;color:#B9C7DC;display:block;margin-top:7px}
+
+footer{
+  margin-top:46px;padding:22px 0 40px;
+  border-top:1px solid var(--rule);font-size:12px;color:var(--ink-2);
+}
+footer a{color:var(--air-blue)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="airmail"></div>
+
+<div class="wrap">
+<header>
+  <div class="brand"><b>Omakase Ship</b><span>Akihabara, Tokyo</span><span class="mono">est. rates Jul 2026</span></div>
+</header>
+
+<h1>How much to ship<br>from Japan?<br><em>Here's the number.</em></h1>
+<p class="lede">Real Japan Post rates — not an estimate range. Set the weight of your parcel and see what it costs to send it home, and how long it takes.</p>
+
+<!-- ========== CALCULATOR ========== -->
+<div class="calc">
+  <div class="calc-head"><span>Rate Calculator</span><span class="mono" id="svcTag">AIR PARCEL</span></div>
+  <div class="calc-body">
+
+    <div class="field">
+      <label for="dest">Shipping to</label>
+      <select id="dest">
+        <option value="4" selected>United States</option>
+        <option value="3">Europe (UK, France, Germany…)</option>
+        <option value="3">Canada</option>
+        <option value="3">Australia / New Zealand</option>
+        <option value="2">Singapore / Thailand / Malaysia</option>
+        <option value="2">Philippines / Vietnam / Indonesia</option>
+        <option value="1">South Korea</option>
+        <option value="1">Taiwan</option>
+        <option value="1">China / Hong Kong</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="wt">Weight of your shopping</label>
+      <div class="wt-row">
+        <span class="wt-val mono" id="wtVal">1.00</span>
+        <span class="wt-unit">KG &nbsp;·&nbsp; about <span id="wtRef">3 figures</span></span>
+      </div>
+      <input type="range" id="wt" min="100" max="4000" step="10" value="1000"
+             aria-label="Weight of your shopping in grams">
+    </div>
+
+    <!-- signature element -->
+    <div class="stair-wrap">
+      <div class="stair-label">The price staircase</div>
+      <div class="stair" id="stair" aria-hidden="true"></div>
+      <p class="stair-note" id="stairNote"></p>
+    </div>
+
+    <div class="result">
+      <div class="line">
+        <span class="k">Japan Post postage <span class="svc" id="svcName">Air Parcel</span></span>
+        <span class="v mono" id="post">—</span>
+      </div>
+      <div class="line">
+        <span class="k">Packing, customs form &amp; label</span>
+        <span class="v mono" id="fee">—</span>
+      </div>
+      <div class="line total">
+        <span class="k">Omakase Ship<br>total</span>
+        <span class="v mono" id="total">—</span>
+      </div>
+      <p class="sub">We collect your shopping in Akihabara, pack it, fill in the customs declaration and send it. Import duty in your country is billed separately by your customs office.</p>
+      <span class="eta">Arrives in <b id="eta">—</b></span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== STATIC TABLE (crawlable) ========== -->
+<h2>Cost at a glance</h2>
+<p class="b">Total price including packing and paperwork, in Japanese yen.</p>
+<table>
+  <thead>
+    <tr><th>Destination</th><th>500 g</th><th>1 kg</th><th>2 kg</th><th>3 kg</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>United States</td><td class="n">4,410</td><td class="n">5,460</td><td class="n">11,050</td><td class="n">13,450</td></tr>
+    <tr><td>Europe / Canada / Australia</td><td class="n">3,910</td><td class="n">4,810</td><td class="n">9,700</td><td class="n">11,800</td></tr>
+    <tr><td>Singapore / SE Asia</td><td class="n">3,420</td><td class="n">4,020</td><td class="n">7,100</td><td class="n">8,300</td></tr>
+    <tr><td>Korea / Taiwan / China</td><td class="n">3,270</td><td class="n">3,770</td><td class="n">5,850</td><td class="n">6,850</td></tr>
+  </tbody>
+  <caption>Parcels over 2 kg switch to EMS express, which is faster but costs more per kilo. Rates current as of July 2026.</caption>
+</table>
+
+<h2>Questions people ask</h2>
+
+<h3>How long does it take to ship from Japan to the USA?</h3>
+<p>Air parcel takes 6 to 13 days. EMS, used for anything over 2 kg, takes 4 to 7 days. Both are trackable the whole way.</p>
+
+<h3>Is it cheaper than paying airline baggage fees?</h3>
+<p>Usually, yes — and always if it saves you a second checked bag. Most airlines charge $75 to $150 for one extra bag on a transpacific route. Two kilos to the USA costs ¥11,050, roughly $70.</p>
+
+<h3>Will I pay import duty?</h3>
+<p>That depends on your country and what's in the box. Personal goods below your country's duty-free threshold usually clear without a charge. We declare contents honestly on the customs form — under-declaring is what gets parcels seized.</p>
+
+<h3>What can't be shipped?</h3>
+<p>Lithium batteries on their own, aerosols, alcohol above 24%, and anything flammable. Devices with a battery sealed inside, like a camera or a handheld console, are fine.</p>
+
+<h3>Why does the price jump at certain weights?</h3>
+<p>Japan Post charges in 100 gram steps, so a parcel at 1,010 g costs the same as one at 1,100 g. The calculator above shows where you sit on that staircase — if you're just over a step, taking out the packaging padding can drop you back down.</p>
+
+<a class="cta" href="../">
+  <span class="kicker">Hands full in Akihabara?</span>
+  <span class="big">Drop your shopping with us. We'll send it home.</span>
+  <span class="small">Same-day drop-off · English, 中文, 한국어 · See how it works →</span>
+</a>
+
+<footer>
+  Operated by Ocean Trading Co., Ltd. — a licensed Japanese second-hand dealer with 13 years of export experience. Rates are Japan Post published tariffs as of July 2026 and may change. <a href="../">Back to Omakase Ship</a>
+</footer>
+</div>
+
+<script src="../rates.js"></script>
+<script>
+/* 料金は共通モジュール rates.js（window.AKIBA_RATES）を参照。数値はここに持たない */
+const R = window.AKIBA_RATES;
+const BOX = R.packing.box;   // このページは箱前提で課金
+const ETA = {
+  1:{air:'5–10 days', ems:'2–4 days'},
+  2:{air:'6–12 days', ems:'3–5 days'},
+  3:{air:'7–14 days', ems:'4–7 days'},
+  4:{air:'6–13 days', ems:'4–7 days'}
+};
+
+/* ---------- rate lookup ---------- */
+function postage(zone, g){
+  if(g <= 2000){
+    const i = Math.max(0, Math.ceil(g/100) - 1);
+    return {yen:R.airRates[zone][i], svc:'air', stepG:100,
+            capG:(i+1)*100, nextYen:i<19?R.airRates[zone][i+1]:null};
+  }
+  let i = R.emsSteps.findIndex(w => g <= w);
+  if(i === -1) i = R.emsSteps.length - 1;
+  return {yen:R.emsRates[zone][i], svc:'ems', stepG:500,
+          capG:R.emsSteps[i], nextYen:i<R.emsSteps.length-1?R.emsRates[zone][i+1]:null};
+}
+
+/* ---------- what fits in the box ---------- */
+function ref(g){
+  if(g < 400)  return '1 figure';
+  if(g < 900)  return '2 figures';
+  if(g < 1600) return '3 figures';
+  if(g < 2600) return 'a model kit + extras';
+  if(g < 3600) return 'a full shopping bag';
+  return 'a big haul';
+}
+
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
+const yen = n => '¥' + n.toLocaleString('en-US');
+
+function draw(){
+  const zone = +$('dest').value;
+  const contents = +$('wt').value;         // 中身（買い物）の重量
+  const g = contents + BOX.addWeight;      // 箱の分を足した課金重量
+  const p = postage(zone, g);
+  const total = p.yen + R.handling + BOX.cost;
+
+  $('wtVal').textContent = (contents/1000).toFixed(2);
+  $('wtRef').textContent = ref(contents);
+  $('post').textContent  = yen(p.yen);
+  $('fee').textContent   = yen(R.handling + BOX.cost);
+  $('total').textContent = yen(total);
+  $('eta').textContent   = ETA[zone][p.svc];
+  $('svcName').textContent = p.svc === 'air' ? 'Air Parcel' : 'EMS Express';
+  $('svcTag').textContent  = p.svc === 'air' ? 'AIR PARCEL' : 'EMS EXPRESS';
+
+  /* staircase: 9 steps centred on the current one */
+  const step = p.stepG;
+  const curIdx = Math.ceil(g/step);
+  const start = Math.max(1, curIdx - 4);
+  let html = '';
+  for(let k = start; k < start + 9; k++){
+    const h = 26 + (k - start) * 4.2;
+    const cls = k === curIdx ? 'here' : (k < curIdx ? 'past' : '');
+    html += `<div class="step ${cls}" style="height:${h}%"></div>`;
+  }
+  $('stair').innerHTML = html;
+
+  const headroom = p.capG - g;
+  let note;
+  if(p.nextYen === null){
+    note = `<b>${(p.capG/1000).toFixed(1)} kg</b> is the limit for a single parcel. Heavier hauls go as two boxes.`;
+  } else if(headroom >= step * 0.5){
+    note = `You're paying for <b>${(p.capG/1000).toFixed(1)} kg</b>. There's <span class="good">${headroom} g of room left</span> at this price — add more before it costs anything extra.`;
+  } else {
+    note = `Only <b>${headroom} g</b> until the next step, which adds <b>${yen(p.nextYen - p.yen)}</b>. Worth checking if you can drop a little padding.`;
+  }
+  $('stairNote').innerHTML = note;
+}
+
+$('dest').addEventListener('change', draw);
+$('wt').addEventListener('input', draw);
+draw();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"How much does it cost to ship from Japan to the USA?",
+     "acceptedAnswer":{"@type":"Answer","text":"About ¥5,460 for a 1 kg parcel and ¥11,050 for 2 kg, including packing and customs paperwork. Japan Post charges in 100 gram steps, so the exact price depends on the packed weight."}},
+    {"@type":"Question","name":"How long does it take to ship from Japan to the USA?",
+     "acceptedAnswer":{"@type":"Answer","text":"Air parcel takes 6 to 13 days. EMS, used for parcels over 2 kg, takes 4 to 7 days. Both are trackable."}},
+    {"@type":"Question","name":"Will I pay import duty on a parcel from Japan?",
+     "acceptedAnswer":{"@type":"Answer","text":"It depends on your country and the contents. Personal goods below your country's duty-free threshold usually clear without a charge. Contents are declared honestly on the customs form."}}
+  ]
+}
+</script>
+</body>
+</html>

@@ -39,6 +39,7 @@ header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;
 .kicker{font-size:11px;letter-spacing:.22em;font-weight:700;color:var(--red)}
 h1{font-size:29px;line-height:1.25;letter-spacing:-.02em;margin:8px 0 10px;font-weight:800}
 .lede{font-size:15.5px;color:#c3c8d0;margin:0}
+.herolink{display:inline-block;margin-top:12px;font-size:13.5px;font-weight:700;color:#f2efe8;text-decoration:none;border-bottom:1px solid rgba(242,239,232,.4);padding-bottom:2px}
 
 /* blocks */
 section{margin-top:26px}
@@ -112,6 +113,7 @@ footer b{color:#e7e3da}
     <div class="kicker">AKIHABARA · TOKYO</div>
     <h1 data-i18n="h1"></h1>
     <p class="lede" data-i18n="lede"></p>
+    <a class="herolink" href="./cost/" data-i18n="heroPriceLink"></a>
   </div>
 </header>
 
@@ -216,42 +218,17 @@ footer b{color:#e7e3da}
   </div>
 </footer>
 
+<script src="./rates.js"></script>
 <script>
 /* ============================================================
-   設定 — ここだけ書き換えれば全部反映されます
+   設定 — 料金は rates.js（window.AKIBA_RATES）に集約。ここは連絡先のみ
    ============================================================ */
+var R = window.AKIBA_RATES;   // 共通料金モジュール
 var CONFIG = {
   bizName:  "Omakase Ship by Play Japan",
   whatsapp: "819000000000",              // 国番号81 + 先頭0を除いた番号
   lineId:   "your-line-id",              // LINE公式アカウントID（@は除く）
-  email:    "hello@example.com",
-
-  handling: 1800,   // 1個あたりの取扱手数料（ラベル作成・申告・持込）
-
-  // 梱包の選択肢（材料費と、梱包で増える重量）
-  packing: {
-    box: { cost:150, addWeight:200 },   // 段ボール箱
-    env: { cost: 50, addWeight: 30, maxGrams: 2000 }  // クッション封筒（2kgまで）
-  },
-  freeDays: 3,      // 無料保管日数
-  perDay:   200,    // 無料日数を超えた1日あたりの保管料
-
-  // 国際エアパケット実費（円）— 日本郵便 2026年7月・100g刻み・2kgまで
-  // 添字 = 100g単位（0=〜100g, 9=〜1000g, 19=〜2000g）
-  airRates: {
-    1: [720,820,920,1020,1120,1220,1320,1420,1520,1620,1720,1820,1920,2020,2120,2220,2320,2420,2520,2620],
-    2: [750,870,990,1110,1230,1350,1470,1590,1710,1830,1950,2070,2190,2310,2430,2550,2670,2790,2910,3030],
-    3: [880,1060,1240,1420,1600,1780,1960,2140,2320,2500,2680,2860,3040,3220,3400,3580,3760,3940,4120,4300],
-    4: [1200,1410,1620,1830,2040,2250,2460,2670,2880,3090,3300,3510,3720,3930,4140,4350,4560,4770,4980,5190]
-  },
-  // 2kg超はEMS実費（円）
-  emsSteps: [2000,2500,3000,3500,4000,4500,5000],
-  emsRates: {
-    1: [3400,3900,4400,4900,5400,5900,6400],
-    2: [4550,5150,5750,6350,6950,7550,8150],
-    3: [6700,7750,8800,9850,10900,11950,13000],
-    4: [7900,9100,10300,11500,12700,13900,15100]
-  }
+  email:    "hello@example.com"
 };
 
 var I18N = {
@@ -264,6 +241,7 @@ en:{
  pack_note:"A box protects better but adds about 200 g, which raises the postage. An envelope is lighter and cheaper, but is not suitable for boxed figures or fragile items. Damage to items sent in an envelope is not covered.",
  h1:"Your suitcase is full.<br>We'll send the rest home.",
  lede:"Drop your Akihabara haul with us. We write the customs paperwork, hold it as long as you need, and post it to your door.",
+ heroPriceLink:"Around ¥5,000–6,000 to the USA · See exact rates →",
  how_h:"How it works",
  s1t:"Message us", s1b:"Tell us your destination country and roughly how much you bought. We reply with a firm quote.",
  s2t:"Hand over your bags", s2b:"Meet us in Akihabara, or send them to us from your hotel. We check and repack everything properly.",
@@ -296,6 +274,7 @@ en:{
  pack_note:"紙箱保護性較好，但會增加約200公克，運費也隨之提高。氣泡袋較輕較便宜，但不適合盒裝公仔或易碎品。使用氣泡袋寄送的物品，破損不在補償範圍內。",
  h1:"行李箱已經塞不下了。<br>剩下的交給我們寄回家。",
  lede:"把秋葉原買的東西交給我們。我們幫你填報關資料、代為保管，再寄到你家門口。",
+ heroPriceLink:"寄美國約¥5,000〜6,000 · 查看正確費率 →",
  how_h:"服務流程",
  s1t:"先傳訊息給我們", s1b:"告訴我們寄送國家與大概的數量，我們回覆確定金額。",
  s2t:"把東西交給我們", s2b:"在秋葉原面交，或從飯店寄給我們。我們會逐一確認並重新包裝。",
@@ -328,6 +307,7 @@ en:{
  pack_note:"纸箱保护性更好，但会增加约200克，运费也随之提高。气泡袋更轻更便宜，但不适合盒装手办或易碎品。使用气泡袋寄送的物品，破损不在补偿范围内。",
  h1:"行李箱已经装不下了。<br>剩下的交给我们寄回家。",
  lede:"把秋叶原买的东西交给我们。我们帮你填报关资料、代为保管，再寄到你家门口。",
+ heroPriceLink:"寄美国约¥5,000〜6,000 · 查看正确费率 →",
  how_h:"服务流程",
  s1t:"先给我们发消息", s1b:"告诉我们寄送国家和大概数量，我们回复确定金额。",
  s2t:"把东西交给我们", s2b:"在秋叶原面交，或从酒店寄给我们。我们会逐一确认并重新包装。",
@@ -360,6 +340,7 @@ ko:{
  pack_note:"박스는 보호력이 좋지만 약 200g이 늘어나 우편 요금이 올라갑니다. 봉투는 가볍고 저렴하지만 박스 피규어나 깨지기 쉬운 물건에는 적합하지 않습니다. 봉투로 보낸 물품의 파손은 보상 대상이 아닙니다.",
  h1:"캐리어가 가득 찼나요?<br>남은 건 저희가 보내드립니다.",
  lede:"아키하바라에서 산 물건을 맡겨주세요. 통관 서류 작성부터 보관, 집까지 발송을 대행합니다.",
+ heroPriceLink:"미국까지 약 ¥5,000〜6,000 · 정확한 요금 보기 →",
  how_h:"이용 방법",
  s1t:"먼저 메시지 주세요", s1b:"배송 국가와 대략적인 양을 알려주시면 확정 금액을 안내해 드립니다.",
  s2t:"짐을 맡겨주세요", s2b:"아키하바라에서 직접 전달하거나 호텔에서 보내주세요. 하나하나 확인 후 다시 포장합니다.",
@@ -392,6 +373,7 @@ ja:{
  pack_note:"段ボールは保護力が高い一方、約200g重くなり送料が上がります。封筒は軽く安価ですが、箱入りフィギュアや壊れやすいものには向きません。封筒で発送した商品の破損は補償対象外です。",
  h1:"スーツケースに入りきらない分、<br>ご自宅までお送りします。",
  lede:"秋葉原で買った荷物をお預かりします。通関書類の作成から保管、ご自宅への発送まで代行します。",
+ heroPriceLink:"米国まで約¥5,000〜6,000 · 正確な料金を見る →",
  how_h:"ご利用の流れ",
  s1t:"まずご連絡ください", s1b:"送り先の国とおおよその量をお知らせいただければ、確定金額をご案内します。",
  s2t:"荷物をお預けください", s2b:"秋葉原で直接お渡しいただくか、ホテルからお送りください。中身を確認して梱包し直します。",
@@ -444,48 +426,36 @@ document.querySelectorAll("#langs button").forEach(function(b){
   b.onclick=function(){ applyLang(b.getAttribute("data-lang")); window.scrollTo(0,0); };
 });
 
-function postage(zone, grams){
-  if(grams<=0) return null;
-  if(grams<=2000){
-    var i = Math.ceil(grams/100)-1;
-    return { yen: CONFIG.airRates[zone][i], svc:"Air Packet" };
-  }
-  for(var k=0;k<CONFIG.emsSteps.length;k++){
-    if(grams<=CONFIG.emsSteps[k]) return { yen: CONFIG.emsRates[zone][k], svc:"EMS" };
-  }
-  return null;
-}
-
 function calc(){
   var zone=+$("dest").value, wtSel=+$("wt").value, days=+$("days").value;
 
   // 2kgを超える荷物は封筒不可 → 箱に固定する
   var envOpt = document.querySelector('[data-i18n-opt="pack_env"]');
-  var envTooHeavy = (wtSel + CONFIG.packing.env.addWeight) > CONFIG.packing.env.maxGrams;
+  var envTooHeavy = (wtSel + R.packing.env.addWeight) > R.packing.env.maxGrams;
   envOpt.disabled = envTooHeavy;
   if(envTooHeavy && $("packing").value === "env") $("packing").value = "box";
 
-  var pk = CONFIG.packing[$("packing").value];
+  var pk = R.packing[$("packing").value];
 
   // 梱包で増える重量を足して実重量で計算
   var billable = wtSel + pk.addWeight;
-  var po = postage(zone, billable);
-  var storage = Math.max(0, days-CONFIG.freeDays)*CONFIG.perDay;
+  var po = R.postage(zone, billable);
+  var storage = Math.max(0, days-R.freeDays)*R.perDay;
   if(!po){
     $("estVal").textContent="—";
     $("estSub").textContent = (I18N[lang].pack_over || I18N.en.pack_over);
     return;
   }
 
-  var total = CONFIG.handling + pk.cost + storage + po.yen;
+  var total = R.handling + pk.cost + storage + po.yen;
   $("estVal").textContent = "¥"+total.toLocaleString();
 
   var parts = [
-    "Handling ¥"+CONFIG.handling.toLocaleString(),
+    "Handling ¥"+R.handling.toLocaleString(),
     "Packing ¥"+pk.cost.toLocaleString(),
     po.svc+" ¥"+po.yen.toLocaleString()+" ("+billable+"g)",
-    storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-CONFIG.freeDays)+"d)"
-              : "Storage free ("+CONFIG.freeDays+"d incl.)"
+    storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-R.freeDays)+"d)"
+              : "Storage free ("+R.freeDays+"d incl.)"
   ];
   $("estSub").textContent = parts.join("  ·  ");
   $("packNote").textContent = envTooHeavy
@@ -494,10 +464,10 @@ function calc(){
 
   // もう一方の梱包との差額を出す（封筒が使える重量のときだけ）
   var otherKey = $("packing").value==="box" ? "env" : "box";
-  var ok2 = CONFIG.packing[otherKey];
-  var po2 = envTooHeavy ? null : postage(zone, wtSel + ok2.addWeight);
+  var ok2 = R.packing[otherKey];
+  var po2 = envTooHeavy ? null : R.postage(zone, wtSel + ok2.addWeight);
   if(po2){
-    var t2 = CONFIG.handling + ok2.cost + storage + po2.yen;
+    var t2 = R.handling + ok2.cost + storage + po2.yen;
     var d = total - t2;
     if(d !== 0){
       $("estSub").textContent += "  ·  " +
