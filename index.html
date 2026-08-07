@@ -120,6 +120,17 @@ footer b{color:#e7e3da}
 <div class="wrap">
 
   <section>
+    <h2 data-i18n="ship_h"></h2>
+    <div class="card">
+      <table>
+        <tr><td data-i18n="ship_intl"></td><td class="r num" id="priceIntl">—</td></tr>
+        <tr><td data-i18n="ship_hotel"></td><td class="r num" id="priceHotel">—</td></tr>
+      </table>
+      <p class="small" style="margin:8px 0 0" data-i18n="ship_note"></p>
+    </div>
+  </section>
+
+  <section>
     <h2 data-i18n="how_h"></h2>
     <div class="card">
       <div class="step"><div class="stepno">1</div><div>
@@ -243,6 +254,8 @@ en:{
  lede:"Drop your Akihabara haul with us. We write the customs paperwork, hold it as long as you need, and post it to your door.",
  heroPriceLink:"Around ¥5,000–6,000 to the USA · See exact rates →",
  trackRef:"Referred by ", trackCounter:"Show this at our counter",
+ ship_h:"Two ways to send it home", ship_intl:"International shipping", ship_hotel:"Hotel delivery (within Japan)",
+ ship_note:"Staying a few more nights? We can forward your haul to your next hotel in Japan, or ship it to your home country. Prices are starting points.",
  how_h:"How it works",
  s1t:"Message us", s1b:"Tell us your destination country and roughly how much you bought. We reply with a firm quote.",
  s2t:"Hand over your bags", s2b:"Meet us in Akihabara, or send them to us from your hotel. We check and repack everything properly.",
@@ -277,6 +290,8 @@ en:{
  lede:"把秋葉原買的東西交給我們。我們幫你填報關資料、代為保管，再寄到你家門口。",
  heroPriceLink:"寄美國約¥5,000〜6,000 · 查看正確費率 →",
  trackRef:"介紹來源 ", trackCounter:"請在櫃檯出示此畫面",
+ ship_h:"兩種寄回家的方式", ship_intl:"國際寄送", ship_hotel:"飯店配送（日本國內）",
+ ship_note:"還要多住幾晚？我們可以把戰利品轉送到你在日本的下一間飯店，或寄回你的國家。顯示為起始價。",
  how_h:"服務流程",
  s1t:"先傳訊息給我們", s1b:"告訴我們寄送國家與大概的數量，我們回覆確定金額。",
  s2t:"把東西交給我們", s2b:"在秋葉原面交，或從飯店寄給我們。我們會逐一確認並重新包裝。",
@@ -311,6 +326,8 @@ en:{
  lede:"把秋叶原买的东西交给我们。我们帮你填报关资料、代为保管，再寄到你家门口。",
  heroPriceLink:"寄美国约¥5,000〜6,000 · 查看正确费率 →",
  trackRef:"介绍来源 ", trackCounter:"请在柜台出示此画面",
+ ship_h:"两种寄回家的方式", ship_intl:"国际寄送", ship_hotel:"酒店配送（日本国内）",
+ ship_note:"还要多住几晚？我们可以把战利品转送到你在日本的下一家酒店，或寄回你的国家。显示为起始价。",
  how_h:"服务流程",
  s1t:"先给我们发消息", s1b:"告诉我们寄送国家和大概数量，我们回复确定金额。",
  s2t:"把东西交给我们", s2b:"在秋叶原面交，或从酒店寄给我们。我们会逐一确认并重新包装。",
@@ -345,6 +362,8 @@ ko:{
  lede:"아키하바라에서 산 물건을 맡겨주세요. 통관 서류 작성부터 보관, 집까지 발송을 대행합니다.",
  heroPriceLink:"미국까지 약 ¥5,000〜6,000 · 정확한 요금 보기 →",
  trackRef:"추천인 ", trackCounter:"카운터에서 이 화면을 보여주세요",
+ ship_h:"집으로 보내는 두 가지 방법", ship_intl:"해외 배송", ship_hotel:"호텔 배송(일본 국내)",
+ ship_note:"며칠 더 머무시나요? 다음 호텔로 전달하거나 본국으로 발송해 드립니다. 표시는 시작 가격입니다.",
  how_h:"이용 방법",
  s1t:"먼저 메시지 주세요", s1b:"배송 국가와 대략적인 양을 알려주시면 확정 금액을 안내해 드립니다.",
  s2t:"짐을 맡겨주세요", s2b:"아키하바라에서 직접 전달하거나 호텔에서 보내주세요. 하나하나 확인 후 다시 포장합니다.",
@@ -379,6 +398,8 @@ ja:{
  lede:"秋葉原で買った荷物をお預かりします。通関書類の作成から保管、ご自宅への発送まで代行します。",
  heroPriceLink:"米国まで約¥5,000〜6,000 · 正確な料金を見る →",
  trackRef:"紹介元 ", trackCounter:"受付でこの画面をご提示ください",
+ ship_h:"2つの送り方", ship_intl:"海外発送", ship_hotel:"ホテル配送（日本国内）",
+ ship_note:"まだ滞在が続きますか？次のホテルへお届けするか、ご自宅の国へ発送します。表示は最低料金です。",
  how_h:"ご利用の流れ",
  s1t:"まずご連絡ください", s1b:"送り先の国とおおよその量をお知らせいただければ、確定金額をご案内します。",
  s2t:"荷物をお預けください", s2b:"秋葉原で直接お渡しいただくか、ホテルからお送りください。中身を確認して梱包し直します。",
@@ -421,6 +442,10 @@ function applyLang(L){
   });
   $("noList").innerHTML = t.no.map(function(x){return "<span>"+x+"</span>";}).join("");
   $("bizName").textContent = CONFIG.bizName;
+  // 2つの送り方の「〜」表記（海外は米国0.5kgの最低額、国内はHOTEL_BASE）
+  var fromIntl = R.handling + R.packing.box.cost + R.bestQuote(4,500).postage;
+  $("priceIntl").textContent  = "¥"+fromIntl.toLocaleString()+"〜";
+  $("priceHotel").textContent = "¥"+R.HOTEL_BASE.toLocaleString()+"〜";
   document.querySelectorAll("#langs button").forEach(function(b){
     b.setAttribute("aria-pressed", b.getAttribute("data-lang")===L);
   });
@@ -434,31 +459,32 @@ document.querySelectorAll("#langs button").forEach(function(b){
 function calc(){
   var zone=+$("dest").value, wtSel=+$("wt").value, days=+$("days").value;
 
-  // 2kgを超える荷物は封筒不可 → 箱に固定する
+  // 梱包後重量（1.3倍 と +200g の大きい方）で送料を判定
+  var packed = R.packedWeight(wtSel);
+
+  // 封筒は梱包後2kgまで → 超えたら箱に固定する
   var envOpt = document.querySelector('[data-i18n-opt="pack_env"]');
-  var envTooHeavy = (wtSel + R.packing.env.addWeight) > R.packing.env.maxGrams;
+  var envTooHeavy = packed > R.packing.env.maxGrams;
   envOpt.disabled = envTooHeavy;
   if(envTooHeavy && $("packing").value === "env") $("packing").value = "box";
 
   var pk = R.packing[$("packing").value];
 
-  // 梱包で増える重量を足して実重量で計算
-  var billable = wtSel + pk.addWeight;
-  var po = R.postage(zone, billable);
+  var q = R.bestQuote(zone, wtSel);   // 利用可能な最安サービス（送料のみ）
   var storage = Math.max(0, days-R.freeDays)*R.perDay;
-  if(!po){
+  if(!q){
     $("estVal").textContent="—";
     $("estSub").textContent = (I18N[lang].pack_over || I18N.en.pack_over);
     return;
   }
 
-  var total = R.handling + pk.cost + storage + po.yen;
+  var total = R.handling + pk.cost + storage + q.postage;
   $("estVal").textContent = "¥"+total.toLocaleString();
 
   var parts = [
     "Handling ¥"+R.handling.toLocaleString(),
     "Packing ¥"+pk.cost.toLocaleString(),
-    po.svc+" ¥"+po.yen.toLocaleString()+" ("+billable+"g)",
+    q.label+" ¥"+q.postage.toLocaleString()+" ("+packed+"g)",
     storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-R.freeDays)+"d)"
               : "Storage free ("+R.freeDays+"d incl.)"
   ];
@@ -467,24 +493,21 @@ function calc(){
     ? (I18N[lang].pack_heavy || I18N.en.pack_heavy)
     : I18N[lang].pack_note;
 
-  // もう一方の梱包との差額を出す（封筒が使える重量のときだけ）
-  var otherKey = $("packing").value==="box" ? "env" : "box";
-  var ok2 = R.packing[otherKey];
-  var po2 = envTooHeavy ? null : R.postage(zone, wtSel + ok2.addWeight);
-  if(po2){
-    var t2 = R.handling + ok2.cost + storage + po2.yen;
-    var d = total - t2;
+  // もう一方の梱包との費用差（封筒が使える重量のときだけ。送料は同じ＝費用差のみ）
+  if(!envTooHeavy){
+    var otherKey = $("packing").value==="box" ? "env" : "box";
+    var d = pk.cost - R.packing[otherKey].cost;
     if(d !== 0){
       $("estSub").textContent += "  ·  " +
         (otherKey==="env" ? "Envelope" : "Box") + " " +
         (d>0 ? "−¥"+Math.abs(d).toLocaleString() : "+¥"+Math.abs(d).toLocaleString());
     }
   }
-  buildLinks(total, po, billable);
+  buildLinks(total, q, packed);
 }
 
 
-function buildLinks(total, po, billable){
+function buildLinks(total, q, packed){
   var destTxt=$("dest").options[$("dest").selectedIndex].text;
   var wtTxt=$("wt").options[$("wt").selectedIndex].text;
   var packTxt=$("packing").value==="box" ? "Box" : "Padded envelope";
@@ -494,7 +517,7 @@ function buildLinks(total, po, billable){
           + "Weight: "+wtTxt+"\n"
           + "Packing: "+packTxt+"\n"
           + "Hold for: "+days+" days\n"
-          + "Estimate shown: ¥"+total.toLocaleString()+" ("+po.svc+", billed at "+billable+"g)";
+          + "Estimate shown: ¥"+total.toLocaleString()+" ("+q.label+", billed at "+packed+"g)";
   var enc=encodeURIComponent(msg);
   $("btnWa").href  = "https://wa.me/"+CONFIG.whatsapp+"?text="+enc;
   $("btnLine").href= "https://line.me/R/ti/p/@"+CONFIG.lineId;
