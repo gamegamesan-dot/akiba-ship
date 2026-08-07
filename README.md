@@ -7,14 +7,15 @@
 
 ## ファイル
 
-| ファイル | 用途 |
+| パス | 用途 |
 |---|---|
 | `index.html` | ランディングページ本体(5言語) |
+| `cost/` | 料金計算機ページ |
+| `rates.js` | 料金の唯一の正（手数料・梱包・送料表・`postage()`）。LP と cost が参照 |
+| `tracking.js` | 紹介元トラッキング（`?s=CODE`）。右下バッジ・5言語 |
+| `assets/print/` | 印刷用PDF（提案書A4×2、チラシA6） |
+| `tools/flyer/` | チラシ生成スクリプト |
 | `qr_print.png` | チラシ・POP印刷用(940×1024px) |
-| `flyer_a6_2side.pdf` | A6両面チラシ(105×148mm・2ページ) |
-| `flyer2_side1_print.png` | チラシ表面 350dpi |
-| `flyer2_side2_print.png` | チラシ裏面 350dpi |
-| `make_flyer2.py` | チラシ再生成スクリプト |
 | `qr_web.png` | SNS・画面表示用(376×409px) |
 | `make_qr.py` | QR再生成スクリプト |
 
