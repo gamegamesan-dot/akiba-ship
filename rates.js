@@ -205,10 +205,8 @@
     // 小包重量上限：国別指定 > ゾーン保守 > 30kg
     var parcelMaxG = (opts.parcelMaxKg != null ? opts.parcelMaxKg
                       : (R.zoneConservative[zone] ? R.zoneConservative[zone].parcelMaxKg : 30)) * 1000;
-    // 重量上限（parcel/EMS）は「入力＝買い物重量(grams)」で判定（郵便局の受入上限に対応）。
-    // 料金は梱包後重量で算定するが、料金表は30kgまで → 超過分は30kg段で頭打ち（ratePacked）。
-    // ※eパケットの2kg判定と各サイズ判定は従来どおり梱包後重量ベース（静的表を変えない）。
-    var ratePacked = Math.min(packed, 30000);
+    // 重量上限・料金・サイズ判定はすべて「梱包後重量(packed)」で統一（eパケット2kg判定と同基準）。
+    // 梱包後重量が料金表/上限を超えたら頭打ちせず available=false（reason:'over weight limit'）。
     var out = [];
 
     function sizeCheck(service) {
@@ -226,8 +224,8 @@
 
     // 2) 国際小包 航空便
     (function () {
-      var reason = '', ok = true, yen = R.parcelAirYen(zone, ratePacked);
-      if (grams > parcelMaxG || yen == null) { ok = false; reason = 'over weight limit'; }
+      var reason = '', ok = true, yen = R.parcelAirYen(zone, packed);
+      if (packed > parcelMaxG || yen == null) { ok = false; reason = 'over weight limit'; }
       var sc = sizeCheck('airParcel');
       if (ok && !sc.ok) { ok = false; reason = 'over size limit (' + sc.over.join('; ') + ')'; }
       out.push({ service: 'airParcel', label: 'Air Parcel', postage: ok ? yen : null,
@@ -236,8 +234,8 @@
 
     // 3) EMS
     (function () {
-      var reason = '', ok = true, yen = R.emsYen(zone, ratePacked);
-      if (grams > R.emsMaxG || yen == null) { ok = false; reason = 'over weight limit (30 kg)'; }
+      var reason = '', ok = true, yen = R.emsYen(zone, packed);
+      if (packed > R.emsMaxG || yen == null) { ok = false; reason = 'over weight limit (30 kg)'; }
       var sc = sizeCheck('ems');
       if (ok && !sc.ok) { ok = false; reason = 'over size limit (' + sc.over.join('; ') + ')'; }
       out.push({ service: 'ems', label: 'EMS', postage: ok ? yen : null,

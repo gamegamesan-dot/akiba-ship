@@ -413,7 +413,12 @@ function draw(){
 
   let html='';
   if(avail.length===0){
-    html += `<div class="allsplit">None of our traveller services fit this parcel at this weight or size. <b>Ask us about splitting it into two boxes</b> — we'll quote both.</div>`;
+    if(packed > 30000){
+      html += `<div class="allsplit">${(contents/1000).toFixed(1)} kg of shopping → about ${(packed/1000).toFixed(1)} kg packed.<br>`
+        + `Over the 30 kg limit for a single parcel. <b>We can split this into two boxes</b> — ask us for a quote.</div>`;
+    } else {
+      html += `<div class="allsplit">This parcel doesn’t fit any service at this size. <b>We can split it into smaller boxes</b> — ask us for a quote.</div>`;
+    }
   }
   quotes.forEach((q,idx)=>{
     if(q.available){
