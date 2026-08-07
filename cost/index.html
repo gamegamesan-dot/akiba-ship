@@ -253,17 +253,7 @@ footer a{color:var(--air-blue)}
 
     <div class="field">
       <label for="dest">Shipping to</label>
-      <select id="dest">
-        <option value="4" selected>United States</option>
-        <option value="3">Europe (UK, France, Germany…)</option>
-        <option value="3">Canada</option>
-        <option value="3">Australia / New Zealand</option>
-        <option value="2">Singapore / Thailand / Malaysia</option>
-        <option value="2">Philippines / Vietnam / Indonesia</option>
-        <option value="1">South Korea</option>
-        <option value="1">Taiwan</option>
-        <option value="1">China / Hong Kong</option>
-      </select>
+      <select id="dest" aria-label="Destination country"><!-- populated from rates.js COUNTRIES --></select>
     </div>
 
     <div class="field">
@@ -272,7 +262,7 @@ footer a{color:var(--air-blue)}
         <span class="wt-val mono" id="wtVal">1.00</span>
         <span class="wt-unit">KG &nbsp;·&nbsp; about <span id="wtRef">3 figures</span></span>
       </div>
-      <input type="range" id="wt" min="100" max="4000" step="10" value="1000"
+      <input type="range" id="wt" min="100" max="30000" step="100" value="1000"
              aria-label="Weight of your shopping in grams">
     </div>
 
@@ -306,12 +296,12 @@ footer a{color:var(--air-blue)}
     <tr><th>Destination</th><th>500 g</th><th>1 kg</th><th>2 kg</th><th>3 kg</th></tr>
   </thead>
   <tbody>
-    <tr><td>United States</td><td class="n">4,410</td><td class="n">5,670</td><td class="n">11,150</td><td class="n">13,650</td></tr>
-    <tr><td>Europe / Canada / Australia</td><td class="n">3,910</td><td class="n">4,990</td><td class="n">10,100</td><td class="n">12,250</td></tr>
-    <tr><td>Singapore / SE Asia</td><td class="n">3,420</td><td class="n">4,140</td><td class="n">6,850</td><td class="n">8,050</td></tr>
-    <tr><td>Korea / Taiwan / China</td><td class="n">3,270</td><td class="n">3,870</td><td class="n">5,400</td><td class="n">6,100</td></tr>
+    <tr><td>United States (Zone 4)</td><td class="n">4,410</td><td class="n">5,670</td><td class="n">11,150</td><td class="n">13,650</td></tr>
+    <tr><td>United Kingdom (Zone 3)</td><td class="n">3,910</td><td class="n">4,990</td><td class="n">10,100</td><td class="n">12,250</td></tr>
+    <tr><td>Singapore (Zone 2)</td><td class="n">3,420</td><td class="n">4,140</td><td class="n">6,850</td><td class="n">8,050</td></tr>
+    <tr><td>Taiwan (Zone 1)</td><td class="n">3,270</td><td class="n">3,870</td><td class="n">5,400</td><td class="n">6,100</td></tr>
   </tbody>
-  <caption>Cheapest available option, including packing and paperwork. Up to 2 kg goes as ePacket; heavier parcels as air parcel. Weight shown is your shopping; we bill on packed weight (about 1.3×). Japan Post tariffs retrieved 2026-08-07.</caption>
+  <caption>One representative country per Japan Post zone; other countries in the same zone share the postage. Cheapest available option, including packing and paperwork — up to 2 kg as ePacket, heavier as air parcel. Weight shown is your shopping; we bill on packed weight (about 1.3×). Use the calculator for your exact country, since size and weight limits differ. Tariffs retrieved 2026-08-07.</caption>
 </table>
 
 <h2>Questions people ask</h2>
@@ -374,8 +364,35 @@ function readSize(){
   return {length:longest, girth:2*(A+B+C)-longest};
 }
 
+/* 仕向国セレクトを rates.js の COUNTRIES から生成（地域でグループ化、米国を先頭） */
+function regionOf(c){
+  if(c.code==='US') return 'Most popular';
+  if(c.zone===3) return (c.code==='AU'||c.code==='NZ') ? 'Oceania (Zone 3)' : 'Europe & Canada (Zone 3)';
+  if(c.zone===2) return 'Southeast / South Asia (Zone 2)';
+  if(c.zone===1) return 'East Asia (Zone 1)';
+  return 'Other';
+}
+const REGION_ORDER=['Most popular','Europe & Canada (Zone 3)','Oceania (Zone 3)',
+                    'Southeast / South Asia (Zone 2)','East Asia (Zone 1)'];
+function buildDestSelect(){
+  const groups={};
+  R.COUNTRIES.forEach(c=>{ (groups[regionOf(c)]=groups[regionOf(c)]||[]).push(c); });
+  let html='';
+  REGION_ORDER.forEach(rg=>{
+    if(!groups[rg]) return;
+    html+=`<optgroup label="${rg}">`;
+    groups[rg].forEach(c=>{
+      const sel = c.code==='US' ? ' selected' : '';
+      html+=`<option value="${c.code}"${sel}>${c.nameEn}</option>`;
+    });
+    html+='</optgroup>';
+  });
+  $('dest').innerHTML=html;
+}
+
 function draw(){
-  const zone = +$('dest').value;
+  const c = R.country($('dest').value) || R.country('US');
+  const zone = c.zone;
   const contents = +$('wt').value;
   const size = readSize();
   const packed = R.packedWeight(contents);
@@ -383,7 +400,9 @@ function draw(){
   $('wtVal').textContent = (contents/1000).toFixed(2);
   $('wtRef').textContent = ref(contents);
 
-  const quotes = R.quoteAll(zone, contents, size || {}).filter(q => q.service in ORDER);
+  const quotes = R.quoteAll(zone, contents, size || {},
+                            {country:c.code, std:c.sizeStd, parcelMaxKg:c.parcelMaxKg})
+                  .filter(q => q.service in ORDER);
   quotes.sort((x,y)=>{
     if(x.available!==y.available) return x.available ? -1 : 1;
     if(x.available) return x.postage - y.postage;
@@ -415,8 +434,11 @@ function draw(){
   if(size){
     const overAny = quotes.some(q=>!q.available && /size limit/.test(q.reason));
     if(overAny){
-      sh.textContent='This box exceeds the size limit of the greyed-out service(s). Size limits differ by country — we confirm before shipping.';
+      sh.textContent=`This box exceeds the parcel size limit for ${c.nameEn}. Size limits differ by country — we confirm before shipping.`;
       sh.classList.add('warn');
+    } else if(c.sizeStd==='unknown'){
+      sh.textContent=`Within the conservative size limit we apply for ${c.nameEn} — its exact parcel limit isn’t confirmed yet, so we double-check before shipping.`;
+      sh.classList.remove('warn');
     } else {
       sh.textContent='This box is within every listed service’s size limit.';
       sh.classList.remove('warn');
@@ -427,7 +449,7 @@ function draw(){
   }
 
   const duty=$('dutyNotice');
-  if(zone===4){
+  if(c.code==='US'){
     duty.hidden=false;
     duty.innerHTML='<b>Shipping to the United States:</b> US import duty is paid in advance and is '
       +'<b>not included in this estimate</b>. Parcels over about US$100 need duty prepaid before mailing; '
@@ -438,6 +460,7 @@ function draw(){
   }
 }
 
+buildDestSelect();
 $('dest').addEventListener('change', draw);
 $('wt').addEventListener('input', draw);
 ['dimL','dimW','dimH'].forEach(id=>$(id).addEventListener('input', draw));

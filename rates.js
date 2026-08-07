@@ -91,7 +91,42 @@
       2: { parcelStd: 'A', parcelMaxKg: 30 },  // 星(B)/泰(B)/他unknown → A(保守)
       3: { parcelStd: 'A', parcelMaxKg: 20 },  // 独仏豪(A)/加英(B)、豪20kg → A・20kg
       4: { parcelStd: 'A', parcelMaxKg: 30 }   // 米(A)
-    }
+    },
+
+    // ===== 仕向国テーブル（cost計算機の国別セレクト用）=====
+    // { code(ISO2), nameEn, zone, sizeStd('A'|'B'|'unknown'), parcelMaxKg }
+    // sizeStd/parcelMaxKg は国別条件表（取得日2026-08-07）。'unknown' はゾーンのみ確定・
+    // 小包サイズ未確認 → fitsSize は保守的に基準Aで判定し「要確認」警告を出す。
+    // ★国を増やすときはこの配列に1行足すだけ（セレクトに自動反映）。
+    COUNTRIES: [
+      // --- 取得済み12カ国（サイズ確定） ---
+      { code: 'US', nameEn: 'United States',   zone: 4, sizeStd: 'A', parcelMaxKg: 30 },
+      { code: 'CA', nameEn: 'Canada',          zone: 3, sizeStd: 'B', parcelMaxKg: 30 },
+      { code: 'GB', nameEn: 'United Kingdom',  zone: 3, sizeStd: 'B', parcelMaxKg: 30 },
+      { code: 'FR', nameEn: 'France',          zone: 3, sizeStd: 'A', parcelMaxKg: 30 },
+      { code: 'DE', nameEn: 'Germany',         zone: 3, sizeStd: 'A', parcelMaxKg: 30 },
+      { code: 'AU', nameEn: 'Australia',       zone: 3, sizeStd: 'A', parcelMaxKg: 20 },
+      { code: 'SG', nameEn: 'Singapore',       zone: 2, sizeStd: 'B', parcelMaxKg: 30 },
+      { code: 'TH', nameEn: 'Thailand',        zone: 2, sizeStd: 'B', parcelMaxKg: 30 },
+      { code: 'KR', nameEn: 'South Korea',     zone: 1, sizeStd: 'A', parcelMaxKg: 20 },
+      { code: 'TW', nameEn: 'Taiwan',          zone: 1, sizeStd: 'B', parcelMaxKg: 30 },
+      { code: 'CN', nameEn: 'China',           zone: 1, sizeStd: 'B', parcelMaxKg: 30 },
+      { code: 'HK', nameEn: 'Hong Kong',       zone: 1, sizeStd: 'B', parcelMaxKg: 30 },
+      // --- ゾーンのみ確定・小包サイズ未確認（保守A判定＋要確認）。上限は一般値30kg ---
+      { code: 'IT', nameEn: 'Italy',           zone: 3, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'ES', nameEn: 'Spain',           zone: 3, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'NL', nameEn: 'Netherlands',     zone: 3, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'NZ', nameEn: 'New Zealand',     zone: 3, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'MY', nameEn: 'Malaysia',        zone: 2, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'PH', nameEn: 'Philippines',     zone: 2, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'VN', nameEn: 'Vietnam',         zone: 2, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'ID', nameEn: 'Indonesia',       zone: 2, sizeStd: 'unknown', parcelMaxKg: 30 },
+      { code: 'IN', nameEn: 'India',           zone: 2, sizeStd: 'unknown', parcelMaxKg: 30 }
+    ]
+  };
+  R.country = function (code) {
+    for (var i = 0; i < R.COUNTRIES.length; i++) if (R.COUNTRIES[i].code === code) return R.COUNTRIES[i];
+    return null;
   };
 
   // ---- 梱包後重量（g）：1.3倍 と +200g の大きい方 ----
@@ -130,15 +165,14 @@
     if (service === 'ems') {
       lim = (opts.country && R.emsSizeByCountry[opts.country]) || R.emsSize;
     } else if (service === 'airParcel' || service === 'sea') {
-      var std;
-      if (opts.country) {
-        var s = R.parcelSizeStandard[opts.country];
-        if (!s) { std = R.STD_A; note = '国により異なるため要確認'; }      // unknown → 保守的にA
-        else std = (s === 'A') ? R.STD_A : R.STD_B;
-      } else if (opts.zone && R.zoneConservative[opts.zone]) {
+      // 基準の決定：std直指定 > 国別表 > ゾーン保守 > A(保守)
+      var std, s = opts.std || (opts.country ? R.parcelSizeStandard[opts.country] : null);
+      if (s === 'A') { std = R.STD_A; }
+      else if (s === 'B') { std = R.STD_B; }
+      else if (opts.zone && !opts.country && R.zoneConservative[opts.zone]) {
         std = (R.zoneConservative[opts.zone].parcelStd === 'A') ? R.STD_A : R.STD_B;
         note = '同一ゾーン内で最も厳しい基準で判定（国により異なるため要確認）';
-      } else { std = R.STD_A; note = '国により異なるため要確認'; }
+      } else { std = R.STD_A; note = '国により異なるため要確認'; }   // unknown / 未登録 → 保守的にA
       lim = std;
     } else {
       return { ok: true, over: [], note: 'no size rule' }; // eパケット等はサイズ判定対象外
@@ -162,16 +196,25 @@
   //   postage = 送料のみ（円）。手数料・梱包・保管はページ側で共通加算する。
   //   available=false のとき postage=null、reason に理由（over weight/size limit 等）。
   //   船便・SAL は常に available=false（データは保持しつつ cost では非表示）。
-  R.quoteAll = function (zone, grams, sizeCm) {
+  R.quoteAll = function (zone, grams, sizeCm, opts) {
     sizeCm = sizeCm || {};
+    opts = opts || {};
     var packed = R.packedWeight(grams);
     var L = (sizeCm.length != null) ? sizeCm.length : null;
     var G = (sizeCm.girth != null) ? sizeCm.girth : null;
+    // 小包重量上限：国別指定 > ゾーン保守 > 30kg
+    var parcelMaxG = (opts.parcelMaxKg != null ? opts.parcelMaxKg
+                      : (R.zoneConservative[zone] ? R.zoneConservative[zone].parcelMaxKg : 30)) * 1000;
+    // 重量上限（parcel/EMS）は「入力＝買い物重量(grams)」で判定（郵便局の受入上限に対応）。
+    // 料金は梱包後重量で算定するが、料金表は30kgまで → 超過分は30kg段で頭打ち（ratePacked）。
+    // ※eパケットの2kg判定と各サイズ判定は従来どおり梱包後重量ベース（静的表を変えない）。
+    var ratePacked = Math.min(packed, 30000);
     var out = [];
 
     function sizeCheck(service) {
       if (L == null && G == null) return { ok: true, over: [] };
-      return R.fitsSize(service, L, G, { zone: zone });
+      var so = opts.country ? { country: opts.country, std: opts.std } : { zone: zone };
+      return R.fitsSize(service, L, G, so);
     }
 
     // 1) 国際eパケット/小形包装物（2kg上限・サイズ判定は対象外）
@@ -183,8 +226,8 @@
 
     // 2) 国際小包 航空便
     (function () {
-      var reason = '', ok = true, yen = R.parcelAirYen(zone, packed);
-      if (packed > R.zoneParcelMaxG(zone) || yen == null) { ok = false; reason = 'over weight limit'; }
+      var reason = '', ok = true, yen = R.parcelAirYen(zone, ratePacked);
+      if (grams > parcelMaxG || yen == null) { ok = false; reason = 'over weight limit'; }
       var sc = sizeCheck('airParcel');
       if (ok && !sc.ok) { ok = false; reason = 'over size limit (' + sc.over.join('; ') + ')'; }
       out.push({ service: 'airParcel', label: 'Air Parcel', postage: ok ? yen : null,
@@ -193,8 +236,8 @@
 
     // 3) EMS
     (function () {
-      var reason = '', ok = true, yen = R.emsYen(zone, packed);
-      if (packed > R.emsMaxG || yen == null) { ok = false; reason = 'over weight limit (30 kg)'; }
+      var reason = '', ok = true, yen = R.emsYen(zone, ratePacked);
+      if (grams > R.emsMaxG || yen == null) { ok = false; reason = 'over weight limit (30 kg)'; }
       var sc = sizeCheck('ems');
       if (ok && !sc.ok) { ok = false; reason = 'over size limit (' + sc.over.join('; ') + ')'; }
       out.push({ service: 'ems', label: 'EMS', postage: ok ? yen : null,
@@ -213,8 +256,8 @@
   };
 
   // ---- 利用可能な最安サービス（送料ベース）。ルートLPのヒーロー/概算用 ----
-  R.bestQuote = function (zone, grams, sizeCm) {
-    var qs = R.quoteAll(zone, grams, sizeCm).filter(function (q) { return q.available && q.postage != null; });
+  R.bestQuote = function (zone, grams, sizeCm, opts) {
+    var qs = R.quoteAll(zone, grams, sizeCm, opts).filter(function (q) { return q.available && q.postage != null; });
     qs.sort(function (a, b) { return a.postage - b.postage; });
     return qs[0] || null;
   };
