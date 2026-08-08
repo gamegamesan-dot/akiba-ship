@@ -216,6 +216,9 @@ footer a{color:var(--air-blue)}
 .svc-row .k{font-size:15px;color:var(--ink);font-weight:600}
 .svc-row .days{display:block;font-size:12px;color:var(--ink-2);font-weight:400;letter-spacing:.04em}
 .svc-row .official{display:block;font-size:11px;color:var(--ink-2);font-weight:400;letter-spacing:.02em;margin-top:1px}
+.svc-row.weak{opacity:.55}
+.svc-row.weak .v{color:var(--ink-2)}
+.svc-row .note{display:block;font-size:11px;color:var(--ink-2);font-style:italic;margin-top:2px}
 .svc-row .v{font-size:21px;font-weight:800;letter-spacing:-.02em}
 .svc-row.best .v{color:var(--air-red)}
 .svc-row.best .k::after{content:"CHEAPEST";margin-left:8px;font-size:9px;letter-spacing:.14em;
@@ -360,6 +363,9 @@ function ref(g){
   return 'a big haul';
 }
 
+/* 目安日数の文字列（例 "6–13 days"）から最大日数を取り出す（速さ比較用） */
+function maxDaysOf(s){ const m=(s||'').match(/\d+/g); return m ? Math.max.apply(null, m.map(Number)) : 999; }
+
 /* 3辺(cm)。国際は length/girth(=長さ+胴回り)、国内は sum3(3辺合計) を使う。未入力 null */
 function readDims(){
   const a=parseFloat($('dimL').value), b=parseFloat($('dimW').value), c=parseFloat($('dimH').value);
@@ -434,8 +440,15 @@ function drawInternational(code, contents){
     if(x.available) return x.postage - y.postage;
     return ORDER[x.service]-ORDER[y.service];
   });
-  const avail = quotes.filter(q=>q.available);
   const base = R.handling + BOX.cost;
+  // 利用可能分に総額と目安日数を付与。劣後＝「他に安く、かつ同等以上に速い」便が存在する
+  const avail = quotes.filter(q=>q.available)
+    .map(q=>({q:q, total:base+q.postage, maxDays:maxDaysOf(q.days)}));
+  avail.forEach(a=>{
+    a.dominated = avail.some(b=> b!==a && b.total < a.total && b.maxDays <= a.maxDays);
+  });
+  const ordered = avail.filter(a=>!a.dominated).concat(avail.filter(a=>a.dominated)); // 劣後は末尾
+  const unavail = quotes.filter(q=>!q.available);
 
   let html='';
   if(avail.length===0){
@@ -446,14 +459,16 @@ function drawInternational(code, contents){
       html += `<div class="allsplit">This parcel doesn’t fit any service at this size. <b>We can split it into smaller boxes</b> — ask us for a quote.</div>`;
     }
   }
-  quotes.forEach((q,idx)=>{
+  ordered.forEach((a,idx)=>{
+    const q=a.q;
     const off = q.officialName ? `<span class="official">${q.officialName}</span>` : '';
-    if(q.available){
-      const cls = (idx===0) ? 'svc-row best' : 'svc-row';
-      html += `<div class="${cls}"><span class="k">${q.label}${off}<span class="days">Arrives in ${q.days}</span></span><span class="v mono">${yen(base+q.postage)}</span></div>`;
-    } else {
-      html += `<div class="svc-row off"><span class="k">${q.label}${off}<span class="reason">Not available — ${q.reason}</span></span><span class="v mono">—</span></div>`;
-    }
+    const cls = 'svc-row' + (idx===0 ? ' best' : '') + (a.dominated ? ' weak' : '');
+    const note = a.dominated ? `<span class="note">Not recommended for this weight</span>` : '';
+    html += `<div class="${cls}"><span class="k">${q.label}${off}<span class="days">Arrives in ${q.days}</span>${note}</span><span class="v mono">${yen(a.total)}</span></div>`;
+  });
+  unavail.forEach(q=>{
+    const off = q.officialName ? `<span class="official">${q.officialName}</span>` : '';
+    html += `<div class="svc-row off"><span class="k">${q.label}${off}<span class="reason">Not available — ${q.reason}</span></span><span class="v mono">—</span></div>`;
   });
   $('cmp').innerHTML = html;
 
