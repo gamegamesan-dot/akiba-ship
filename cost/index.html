@@ -215,6 +215,7 @@ footer a{color:var(--air-blue)}
 .svc-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}
 .svc-row .k{font-size:15px;color:var(--ink);font-weight:600}
 .svc-row .days{display:block;font-size:12px;color:var(--ink-2);font-weight:400;letter-spacing:.04em}
+.svc-row .official{display:block;font-size:11px;color:var(--ink-2);font-weight:400;letter-spacing:.02em;margin-top:1px}
 .svc-row .v{font-size:21px;font-weight:800;letter-spacing:-.02em}
 .svc-row.best .v{color:var(--air-red)}
 .svc-row.best .k::after{content:"CHEAPEST";margin-left:8px;font-size:9px;letter-spacing:.14em;
@@ -301,8 +302,11 @@ footer a{color:var(--air-blue)}
     <tr><td>Singapore (Zone 2)</td><td class="n">3,420</td><td class="n">4,140</td><td class="n">6,850</td><td class="n">8,050</td></tr>
     <tr><td>Taiwan (Zone 1)</td><td class="n">3,270</td><td class="n">3,870</td><td class="n">5,400</td><td class="n">6,100</td></tr>
   </tbody>
-  <caption>One representative country per Japan Post zone; other countries in the same zone share the postage. Cheapest available option, including packing and paperwork — up to 2 kg as ePacket, heavier as air parcel. Weight shown is your shopping; we bill on packed weight (about 1.3×). Use the calculator for your exact country, since size and weight limits differ. Tariffs retrieved 2026-08-07.</caption>
+  <caption id="tableCaption">One representative country per Japan Post zone; other countries in the same zone share the postage. Cheapest available option, including packing and paperwork. Weight shown is your shopping; we bill on packed weight (about 1.3×). Use the calculator for your exact country, since size and weight limits differ. Tariffs retrieved 2026-08-07.</caption>
 </table>
+
+<h2>Delivering within Japan</h2>
+<p>Staying a few more nights? We can forward your Akihabara shopping to your next hotel inside Japan by <b>Yu-Pack (ゆうパック)</b>, from <span class="mono">¥1,980</span> <em>(estimate)</em>. Size up to 170&nbsp;cm (3 sides total) and 25&nbsp;kg. Pick <b>“Hotel in Tokyo”</b> or <b>“Hotel elsewhere in Japan”</b> at the top of the calculator above — no customs paperwork, no import duty.</p>
 
 <h2>Questions people ask</h2>
 
@@ -322,7 +326,7 @@ footer a{color:var(--air-blue)}
 <p>Lithium batteries on their own, aerosols, alcohol above 24%, and anything flammable. Devices with a battery sealed inside, like a camera or a handheld console, are fine.</p>
 
 <h3>Why does the price jump at certain weights?</h3>
-<p>Japan Post charges in fixed weight steps, so a parcel at 1,010 g costs the same as one at 1,100 g. Past 2 kg the cheapest option changes from ePacket to air parcel, which is where the biggest jump happens. If you're just over a step, trimming a little packing can drop you back down.</p>
+<p id="faqJump">Japan Post charges in fixed weight steps, so a parcel at 1,010 g costs the same as one at 1,100 g. Past 2 kg the cheapest option changes to a heavier service, which is where the biggest jump happens. If you're just over a step, trimming a little packing can drop you back down.</p>
 
 <a class="cta" href="../">
   <span class="kicker">Hands full in Akihabara?</span>
@@ -337,12 +341,13 @@ footer a{color:var(--air-blue)}
 
 <script src="../rates.js"></script>
 <script>
-/* 料金は共通モジュール rates.js（window.AKIBA_RATES）を参照。数値はここに持たない。
-   quoteAll() で全サービスを比較。表示は ePacket/Air Parcel/EMS の3種のみ
-   （船便・SAL はデータ保持だが非表示）。packedWeight(1.3倍/+200g)で課金。 */
+/* 料金・表示名は共通モジュール rates.js（window.AKIBA_RATES）を参照。数値もサービス名も
+   ここに持たない。国際は quoteAll() で Small Parcel / Standard Parcel / EMS を比較
+   （船便・SAL はデータ保持だが非表示）。国内は DOMESTIC（ホテル配送）で別分岐。 */
 const R = window.AKIBA_RATES;
-const BOX = R.packing.box;                        // 箱前提で課金
-const ORDER = {epacket:0, airParcel:1, ems:2};    // 表示する3サービス
+const BOX = R.packing.box;                                 // 箱前提で課金
+const ORDER = {airPacket:0, airParcel:1, ems:2};           // 表示する3サービス
+const DOM_CODES = R.DOMESTIC.options.map(o=>o.code);       // 国内配送コード
 const $ = id => document.getElementById(id);
 const yen = n => '¥' + n.toLocaleString('en-US');
 
@@ -355,16 +360,16 @@ function ref(g){
   return 'a big haul';
 }
 
-/* 3辺(cm) → {length, girth}（girth=長さ+胴回りの合計）。未入力なら null */
-function readSize(){
+/* 3辺(cm)。国際は length/girth(=長さ+胴回り)、国内は sum3(3辺合計) を使う。未入力 null */
+function readDims(){
   const a=parseFloat($('dimL').value), b=parseFloat($('dimW').value), c=parseFloat($('dimH').value);
   if([a,b,c].every(v=>isNaN(v)||v<=0)) return null;
   const A=isNaN(a)?0:a, B=isNaN(b)?0:b, C=isNaN(c)?0:c;
   const longest=Math.max(A,B,C);
-  return {length:longest, girth:2*(A+B+C)-longest};
+  return {length:longest, girth:2*(A+B+C)-longest, sum3:A+B+C};
 }
 
-/* 仕向国セレクトを rates.js の COUNTRIES から生成（地域でグループ化、米国を先頭） */
+/* 仕向地セレクト：先頭に「Within Japan」、続けて国際（COUNTRIES を地域グループ化、米国先頭） */
 function regionOf(c){
   if(c.code==='US') return 'Most popular';
   if(c.zone===3) return (c.code==='AU'||c.code==='NZ') ? 'Oceania (Zone 3)' : 'Europe & Canada (Zone 3)';
@@ -375,12 +380,14 @@ function regionOf(c){
 const REGION_ORDER=['Most popular','Europe & Canada (Zone 3)','Oceania (Zone 3)',
                     'Southeast / South Asia (Zone 2)','East Asia (Zone 1)'];
 function buildDestSelect(){
+  let html='<optgroup label="── Within Japan ──">';
+  R.DOMESTIC.options.forEach(o=>{ html+=`<option value="${o.code}">${o.nameEn}</option>`; });
+  html+='</optgroup>';
   const groups={};
   R.COUNTRIES.forEach(c=>{ (groups[regionOf(c)]=groups[regionOf(c)]||[]).push(c); });
-  let html='';
   REGION_ORDER.forEach(rg=>{
     if(!groups[rg]) return;
-    html+=`<optgroup label="${rg}">`;
+    html+=`<optgroup label="${rg==='Most popular'?'── International ──':rg}">`;
     groups[rg].forEach(c=>{
       const sel = c.code==='US' ? ' selected' : '';
       html+=`<option value="${c.code}"${sel}>${c.nameEn}</option>`;
@@ -390,17 +397,36 @@ function buildDestSelect(){
   $('dest').innerHTML=html;
 }
 
-function draw(){
-  const c = R.country($('dest').value) || R.country('US');
-  const zone = c.zone;
-  const contents = +$('wt').value;
-  const size = readSize();
-  const packed = R.packedWeight(contents);
+/* prose のサービス名を rates.js のラベルから流し込み（HTMLにハードコードしない） */
+function fillProse(){
+  const ap=R.SERVICES.airPacket.label, sp=R.SERVICES.airParcel.label;
+  const cap=$('tableCaption');
+  if(cap) cap.innerHTML='One representative country per Japan Post zone; other countries in the same zone '
+    +`share the postage. Cheapest available option, including packing and paperwork — light items go as `
+    +`<b>${ap}</b>, heavier boxes as <b>${sp}</b>. Weight shown is your shopping; we bill on packed weight `
+    +'(about 1.3×). Use the calculator for your exact country, since size and weight limits differ. '
+    +'Tariffs retrieved 2026-08-07.';
+  const fj=$('faqJump');
+  if(fj) fj.innerHTML='Japan Post charges in fixed weight steps, so a parcel at 1,010 g costs the same as one '
+    +`at 1,100 g. Past 2 kg the cheapest option changes from <b>${ap}</b> to <b>${sp}</b>, which is where the `
+    +'biggest jump happens. If you’re just over a step, trimming a little packing can drop you back down.';
+}
 
+function draw(){
+  const val = $('dest').value;
+  const contents = +$('wt').value;
   $('wtVal').textContent = (contents/1000).toFixed(2);
   $('wtRef').textContent = ref(contents);
+  if(DOM_CODES.indexOf(val) >= 0) drawDomestic(val, contents);
+  else drawInternational(val, contents);
+}
 
-  const quotes = R.quoteAll(zone, contents, size || {},
+function drawInternational(code, contents){
+  const c = R.country(code) || R.country('US');
+  const size = readDims();
+  const packed = R.packedWeight(contents);
+
+  const quotes = R.quoteAll(c.zone, contents, size || {},
                             {country:c.code, std:c.sizeStd, parcelMaxKg:c.parcelMaxKg})
                   .filter(q => q.service in ORDER);
   quotes.sort((x,y)=>{
@@ -409,7 +435,7 @@ function draw(){
     return ORDER[x.service]-ORDER[y.service];
   });
   const avail = quotes.filter(q=>q.available);
-  const base = R.handling + BOX.cost;             // 全サービス共通（保管はこのページでは0）
+  const base = R.handling + BOX.cost;
 
   let html='';
   if(avail.length===0){
@@ -421,16 +447,17 @@ function draw(){
     }
   }
   quotes.forEach((q,idx)=>{
+    const off = q.officialName ? `<span class="official">${q.officialName}</span>` : '';
     if(q.available){
       const cls = (idx===0) ? 'svc-row best' : 'svc-row';
-      html += `<div class="${cls}"><span class="k">${q.label}<span class="days">Arrives in ${q.days}</span></span><span class="v mono">${yen(base+q.postage)}</span></div>`;
+      html += `<div class="${cls}"><span class="k">${q.label}${off}<span class="days">Arrives in ${q.days}</span></span><span class="v mono">${yen(base+q.postage)}</span></div>`;
     } else {
-      html += `<div class="svc-row off"><span class="k">${q.label}<span class="reason">Not available — ${q.reason}</span></span><span class="v mono">—</span></div>`;
+      html += `<div class="svc-row off"><span class="k">${q.label}${off}<span class="reason">Not available — ${q.reason}</span></span><span class="v mono">—</span></div>`;
     }
   });
   $('cmp').innerHTML = html;
 
-  $('svcTag').textContent = avail.length ? avail[0].label.toUpperCase() : 'NO FIT';
+  $('svcTag').textContent = 'COMPARE';
   $('feeNote').textContent =
     `All prices include ${yen(base)} for packing, the customs form and the shipping label. `
     + `Billed on packed weight ${packed} g (your ${(contents/1000).toFixed(2)} kg plus protective packing).`;
@@ -465,7 +492,48 @@ function draw(){
   }
 }
 
+function drawDomestic(code, contents){
+  const size = readDims();
+  const q = R.domesticQuote(code, contents, size || {});   // {base,days,courier,available,over,packed}
+  const packed = q.packed;
+
+  let html='';
+  if(!q.available){
+    html = `<div class="allsplit">${(contents/1000).toFixed(1)} kg → about ${(packed/1000).toFixed(1)} kg packed. `
+      + `This exceeds ${q.courier} limits (${q.over.join(', ')}). <b>We can arrange a heavier courier or split it</b> — ask us for a quote.</div>`;
+  } else {
+    html = `<div class="svc-row best"><span class="k">Hotel delivery`
+      + `<span class="official">${q.courier}</span>`
+      + `<span class="days">Arrives ${q.days} · estimate</span></span>`
+      + `<span class="v mono">${yen(q.base)}〜</span></div>`;
+  }
+  $('cmp').innerHTML = html;
+
+  $('svcTag').textContent = 'WITHIN JAPAN';
+  $('feeNote').textContent =
+    `Domestic delivery to your hotel in Japan via ${q.courier}. ${yen(q.base)} is an estimate — the final price `
+    + `depends on region and box size. Limit: ${R.DOMESTIC.maxSizeCm} cm (3 sides total) and ${R.DOMESTIC.maxKg} kg.`;
+
+  const sh=$('sizeHint');
+  if(size){
+    if(q.over.some(o=>/cm/.test(o))){
+      sh.textContent=`Over the ${R.DOMESTIC.maxSizeCm} cm (3-side total) ${q.courier} size limit — ask us about a courier.`;
+      sh.classList.add('warn');
+    } else {
+      sh.textContent=`Within the ${R.DOMESTIC.maxSizeCm} cm (3-side total) ${q.courier} size limit.`;
+      sh.classList.remove('warn');
+    }
+  } else {
+    sh.textContent=`Leave blank if you don't know. ${q.courier} accepts up to ${R.DOMESTIC.maxSizeCm} cm (3 sides total).`;
+    sh.classList.remove('warn');
+  }
+
+  const duty=$('dutyNotice');   // 国内は関税注記なし
+  duty.hidden=true; duty.innerHTML='';
+}
+
 buildDestSelect();
+fillProse();
 $('dest').addEventListener('change', draw);
 $('wt').addEventListener('input', draw);
 ['dimL','dimW','dimH'].forEach(id=>$(id).addEventListener('input', draw));
@@ -484,7 +552,9 @@ draw();
     {"@type":"Question","name":"Do I need to prepay US import duty on a parcel from Japan?",
      "acceptedAnswer":{"@type":"Answer","text":"For parcels to the United States, import duty on anything worth more than about US$100 must be prepaid before mailing and is not included in the shipping price. Personal gifts and documents up to US$100 are exempt. Last confirmed 2026-08-07."}},
     {"@type":"Question","name":"Will I pay import duty on a parcel from Japan?",
-     "acceptedAnswer":{"@type":"Answer","text":"It depends on your country and the contents. Personal goods below your country's duty-free threshold usually clear without a charge. Contents are declared honestly on the customs form."}}
+     "acceptedAnswer":{"@type":"Answer","text":"It depends on your country and the contents. Personal goods below your country's duty-free threshold usually clear without a charge. Contents are declared honestly on the customs form."}},
+    {"@type":"Question","name":"Can you deliver my shopping to my hotel in Japan?",
+     "acceptedAnswer":{"@type":"Answer","text":"Yes. We can forward your Akihabara shopping to your next hotel within Japan by Yu-Pack, from about 1,980 yen (estimate). Size up to 170 cm (3 sides total) and 25 kg. No customs paperwork or import duty applies to domestic delivery."}}
   ]
 }
 </script>

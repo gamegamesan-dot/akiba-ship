@@ -44,12 +44,14 @@ var CONFIG = {
 | `packing.box` / `packing.env` | 箱・封筒の梱包費用（封筒は梱包後2kgまで） |
 | `PACK_RATIO` / `PACK_MIN_ADD` | 課金重量 = `max(中身×1.3, 中身+200g)` |
 | `HOTEL_BASE` | 国内ホテル配送の基本料金（LP「2つの送り方」に表示） |
-| `epacketRates`（100g刻み） | 国際eパケット/小形包装物（〜2kg）の送料表 |
+| `airPacketRates`（100g刻み） | 国際エアパケット（〜2kg）の送料表（旧称：国際eパケットライト／2026-06-01改称） |
 | `emsRates` / `emsSteps` | EMS の送料表（0.5〜30kg） |
 | `parcelAirRates` / `parcelAirSteps` | 国際小包 航空便の送料表（1〜30kg） |
 | `parcelSeaRef` / `salRef` | 船便・SALの参考データ（**cost では非表示**・法人向け用に保持） |
 | `parcelSizeStandard` / `STD_A` / `STD_B` | 小包サイズ基準（国別 A=105/200・B=150/300、未登録は保守的にA判定） |
-| `quoteAll()` / `fitsSize()` / `bestQuote()` | 全サービス比較・サイズ判定・最安取得 |
+| `SERVICES` | 各サービスの表示名（`label`主表示 ＋ `officialName`副表記＝郵便局呼称）。**表示名の唯一の正・HTMLにハードコードしない** |
+| `COUNTRIES` / `DOMESTIC` | 国際の仕向国テーブル ／ 国内ホテル配送（ゆうパック 170cm・25kg・`HOTEL_BASE`概算） |
+| `quoteAll()` / `fitsSize()` / `bestQuote()` / `domesticQuote()` | 国際比較・サイズ判定・最安取得・国内見積 |
 
 - 送料は日本郵便公式（**取得日 2026-08-07**、出典URLは `rates.js` 冒頭コメント）。値上げ時はここを差し替え。
 - **`rates.js` を変更したら、`cost/` の静的表と JSON-LD の数値、および `assets/print/` のPDFを再生成/更新すること**（静的数値はスクリプトで再計算し手打ちしない）。

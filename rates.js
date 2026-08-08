@@ -25,8 +25,10 @@
     perDay: 200,
     HOTEL_BASE: 1980,    // 国内ホテル配送の基本料金（仮値・後で調整）
 
-    // ===== 国際eパケット/小形包装物（航空・2kgまで・100g刻み。index0=〜100g … 19=〜2000g） =====
-    epacketRates: {
+    // ===== 国際エアパケット（航空・2kgまで・100g刻み。index0=〜100g … 19=〜2000g）=====
+    // ★2026-06-01改称。旧称：国際eパケットライト。国際eパケット（別サービス）は2023-09-30廃止。
+    //   料金はUS 500g¥2,040/1kg¥3,090/2kg¥5,190 が公式の国際エアパケットと一致（確認日2026-08-08）。
+    airPacketRates: {
       1: [720,820,920,1020,1120,1220,1320,1420,1520,1620,1720,1820,1920,2020,2120,2220,2320,2420,2520,2620],
       2: [750,870,990,1110,1230,1350,1470,1590,1710,1830,1950,2070,2190,2310,2430,2550,2670,2790,2910,3030],
       3: [880,1060,1240,1420,1600,1780,1960,2140,2320,2500,2680,2860,3040,3220,3400,3580,3760,3940,4120,4300],
@@ -78,10 +80,33 @@
 
     // 各サービスの目安日数（ゾーン別）。出典：日本郵便サービス比較/料金・日数。
     days: {
-      epacket: { 1: '5–10 days', 2: '6–12 days', 3: '7–14 days', 4: '6–13 days' },
+      airPacket: { 1: '5–10 days', 2: '6–12 days', 3: '7–14 days', 4: '6–13 days' },
       airParcel: { 1: '5–10 days', 2: '6–12 days', 3: '7–14 days', 4: '6–13 days' },
       ems: { 1: '2–4 days', 2: '3–5 days', 3: '4–7 days', 4: '4–7 days' },
       sea: { 1: '1–3 months', 2: '1–3 months', 3: '1–3 months', 4: '1–3 months' }
+    },
+
+    // 表示名の唯一の正：label（客向け主表示）＋ officialName（郵便局呼称・副表記）。
+    // HTML側にサービス名をハードコードしないこと（prose もここから流し込む）。
+    SERVICES: {
+      airPacket: { label: 'Small Parcel (up to 2 kg)', officialName: 'International Air Packet' },
+      airParcel: { label: 'Standard Parcel',           officialName: 'International Parcel (Air)' },
+      ems:       { label: 'EMS Express',                officialName: '' },  // 副表記なし
+      sea:       { label: 'Sea Parcel',                 officialName: 'International Parcel (Sea)' },
+      sal:       { label: 'SAL',                        officialName: '' }
+    },
+
+    // 国内配送（ホテル配送）。ゾーン/サイズ基準/上限重量は国際とは別体系。
+    // ゆうパック（[公式] 3辺合計170cm以下・25kgまで／25〜30kgは重量ゆうパック。確認日2026-08-08）。
+    // HOTEL_BASE は仮値・画面では「概算(estimate)」と明示する。
+    DOMESTIC: {
+      courier: 'Yu-Pack (ゆうパック)',
+      maxSizeCm: 170,   // 3辺（縦+横+高さ）の合計
+      maxKg: 25,        // 標準。25〜30kgは重量ゆうパック（要相談）
+      options: [
+        { code: 'JP-TOKYO', nameEn: 'Hotel in Tokyo',            days: 'Next day' },
+        { code: 'JP-OTHER', nameEn: 'Hotel elsewhere in Japan',  days: '1–2 days' }
+      ]
     },
 
     // cost ページはゾーン選択のため、ゾーン内で最も厳しい小包基準/上限を保守的に採用。
@@ -141,10 +166,10 @@
     for (var i = 0; i < steps.length; i++) if (g <= steps[i]) return arr[i];
     return null; // 上限超
   }
-  R.epacketYen = function (zone, g) {
+  R.airPacketYen = function (zone, g) {
     if (g <= 0 || g > 2000) return null;          // 2kg上限
     var i = Math.ceil(g / 100) - 1;
-    var arr = R.epacketRates[zone];
+    var arr = R.airPacketRates[zone];
     return arr ? arr[i] : null;
   };
   R.emsYen = function (zone, g) {
@@ -175,7 +200,7 @@
       } else { std = R.STD_A; note = '国により異なるため要確認'; }   // unknown / 未登録 → 保守的にA
       lim = std;
     } else {
-      return { ok: true, over: [], note: 'no size rule' }; // eパケット等はサイズ判定対象外
+      return { ok: true, over: [], note: 'no size rule' }; // エアパケット等はサイズ判定対象外
     }
     var over = [];
     if (lengthCm != null && lengthCm > lim.len) over.push('length ' + lengthCm + 'cm > ' + lim.len + 'cm');
@@ -205,7 +230,7 @@
     // 小包重量上限：国別指定 > ゾーン保守 > 30kg
     var parcelMaxG = (opts.parcelMaxKg != null ? opts.parcelMaxKg
                       : (R.zoneConservative[zone] ? R.zoneConservative[zone].parcelMaxKg : 30)) * 1000;
-    // 重量上限・料金・サイズ判定はすべて「梱包後重量(packed)」で統一（eパケット2kg判定と同基準）。
+    // 重量上限・料金・サイズ判定はすべて「梱包後重量(packed)」で統一（エアパケット2kg判定と同基準）。
     // 梱包後重量が料金表/上限を超えたら頭打ちせず available=false（reason:'over weight limit'）。
     var out = [];
 
@@ -215,10 +240,10 @@
       return R.fitsSize(service, L, G, so);
     }
 
-    // 1) 国際eパケット/小形包装物（2kg上限・サイズ判定は対象外）
+    // 1) 国際エアパケット（2kg上限・サイズ判定は対象外）
     (function () {
-      var yen = R.epacketYen(zone, packed);
-      out.push({ service: 'epacket', label: 'ePacket', postage: yen, days: R.days.epacket[zone],
+      var yen = R.airPacketYen(zone, packed);
+      out.push({ service: 'airPacket', postage: yen, days: R.days.airPacket[zone],
                  available: yen != null, reason: yen != null ? '' : 'over weight limit (2 kg)' });
     })();
 
@@ -228,7 +253,7 @@
       if (packed > parcelMaxG || yen == null) { ok = false; reason = 'over weight limit'; }
       var sc = sizeCheck('airParcel');
       if (ok && !sc.ok) { ok = false; reason = 'over size limit (' + sc.over.join('; ') + ')'; }
-      out.push({ service: 'airParcel', label: 'Air Parcel', postage: ok ? yen : null,
+      out.push({ service: 'airParcel', postage: ok ? yen : null,
                  days: R.days.airParcel[zone], available: ok, reason: reason });
     })();
 
@@ -238,17 +263,23 @@
       if (packed > R.emsMaxG || yen == null) { ok = false; reason = 'over weight limit (30 kg)'; }
       var sc = sizeCheck('ems');
       if (ok && !sc.ok) { ok = false; reason = 'over size limit (' + sc.over.join('; ') + ')'; }
-      out.push({ service: 'ems', label: 'EMS', postage: ok ? yen : null,
+      out.push({ service: 'ems', postage: ok ? yen : null,
                  days: R.days.ems[zone], available: ok, reason: reason });
     })();
 
     // 4) 船便（旅行者には輸送日数が不適 → 常に非表示扱い。データは保持）
-    out.push({ service: 'sea', label: 'Sea Parcel', postage: null, days: R.days.sea[zone],
+    out.push({ service: 'sea', postage: null, days: R.days.sea[zone],
                available: false, reason: 'not offered — transit time unsuitable for travelers' });
 
     // 5) SAL（引受停止中。2026-08-07時点。再開時は要更新）
-    out.push({ service: 'sal', label: 'SAL', postage: null, days: null,
+    out.push({ service: 'sal', postage: null, days: null,
                available: false, reason: 'service suspended (2026-08-07)' });
+
+    // 表示名は R.SERVICES に一元化して付与（HTML側でハードコードしない）
+    out.forEach(function (o) {
+      var s = R.SERVICES[o.service] || {};
+      o.label = s.label; o.officialName = s.officialName || '';
+    });
 
     return out;
   };
@@ -258,6 +289,24 @@
     var qs = R.quoteAll(zone, grams, sizeCm, opts).filter(function (q) { return q.available && q.postage != null; });
     qs.sort(function (a, b) { return a.postage - b.postage; });
     return qs[0] || null;
+  };
+
+  // ---- 国内ホテル配送の見積り（国際とは別体系）。sizeCm.sum3=3辺合計(cm) ----
+  R.domesticQuote = function (code, grams, sizeCm) {
+    var opt = null, i;
+    for (i = 0; i < R.DOMESTIC.options.length; i++) if (R.DOMESTIC.options[i].code === code) opt = R.DOMESTIC.options[i];
+    if (!opt) return null;
+    sizeCm = sizeCm || {};
+    var packed = R.packedWeight(grams);
+    var sum3 = (sizeCm.sum3 != null) ? sizeCm.sum3 : null;
+    var over = [];
+    if (packed > R.DOMESTIC.maxKg * 1000) over.push('over ' + R.DOMESTIC.maxKg + ' kg');
+    if (sum3 != null && sum3 > R.DOMESTIC.maxSizeCm) over.push('over ' + R.DOMESTIC.maxSizeCm + ' cm (3-side total)');
+    return {
+      code: opt.code, nameEn: opt.nameEn, days: opt.days, courier: R.DOMESTIC.courier,
+      base: R.HOTEL_BASE, estimate: true, packed: packed,
+      available: over.length === 0, over: over
+    };
   };
 
   if (typeof window !== 'undefined') window.AKIBA_RATES = R;
