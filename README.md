@@ -11,9 +11,10 @@
 |---|---|
 | `index.html` | ランディングページ本体(5言語) |
 | `cost/` | 料金計算機ページ |
+| `partner/` | 提携店募集ページ（日英切替・業種別提案PDFへのリンク） |
 | `rates.js` | 料金の唯一の正（手数料・梱包・送料表・`quoteAll()`/`fitsSize()`）。LP と cost が参照 |
 | `tracking.js` | 紹介元トラッキング（`?s=CODE`）。右下バッジ・5言語 |
-| `assets/print/` | 印刷用PDF（提案書A4×2、チラシA6） |
+| `assets/print/` | 印刷用PDF（提案書A4×3〔ホテル/物販/カフェ〕、チラシA6） |
 | `tools/flyer/` | チラシ生成スクリプト |
 | `qr_print.png` | チラシ・POP印刷用(940×1024px) |
 | `qr_web.png` | SNS・画面表示用(376×409px) |

@@ -6,9 +6,12 @@
 
 | ファイル名 | 用途（日本語） | 判型 |
 |---|---|---|
+| `proposal-hotel-a4.pdf` | ホテル・ホステル向け 導入提案書（日英2ページ） | A4 |
 | `proposal-retail-a4.pdf` | 物販店（フィギュア・ホビー店等）向け 導入提案書 | A4 |
 | `proposal-cafe-a4.pdf` | コンカフェ向け 導入提案書 | A4 |
 | `flyer-a6-2side.pdf` | 店頭配布用チラシ（表: サービス+QR / 裏: 手順+料金+QR） | A6 両面 |
+
+これらは提携店募集ページ [`/partner/`](../../partner/index.html) からもリンクされています。
 
 ### 旧ファイル名との対応（2026-08-07 リネーム）
 
@@ -17,6 +20,7 @@
 | `店舗様ご提案_OmakaseShip_A4.pdf` | `proposal-retail-a4.pdf` |
 | `コンカフェ様ご提案_OmakaseShip_A4.pdf` | `proposal-cafe-a4.pdf` |
 | `チラシA6_両面_OmakaseShip.pdf` | `flyer-a6-2side.pdf` |
+| `ホテル・ホステル様ご提案_OmakaseShip_A4.pdf` | `proposal-hotel-a4.pdf`（2026-08-08 新規） |
 
 ## 印刷メモ
 

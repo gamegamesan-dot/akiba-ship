@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>提携店募集 | Omakase Ship by Play Japan — 秋葉原の発送代行</title>
+<meta name="description" content="秋葉原周辺のホテル・ホステル・物販店・飲食店様へ。訪日のお客様の荷物を国際発送・国内転送します。ご成約1件につき500円。費用0円、契約金なし。">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://gamegamesan-dot.github.io/akiba-ship/partner/">
+<meta property="og:title" content="提携店募集 | Omakase Ship">
+<meta property="og:description" content="チラシを1枚置いていただくだけ。ご成約1件につき500円をお支払いします。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800;900&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1F4F8; --panel:#FFF; --ink:#0E1626; --ink-2:#4A576C;
+  --rule:#C7D1E0; --air-red:#C8352C; --air-blue:#1D4E9C;
+  --stamp:#E4EAF3; --ok:#1B6B4A; --hi:#FDF0EE;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans JP','Archivo',system-ui,sans-serif;
+  font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+.en-only{display:none}
+body.en .ja-only{display:none}
+body.en .en-only{display:inline}
+body.en p.en-only,body.en div.en-only,body.en li.en-only{display:block}
+.wrap{max-width:660px;margin:0 auto;padding:0 20px}
+
+.airmail{
+  height:9px;
+  background:repeating-linear-gradient(-45deg,
+    var(--air-red) 0 14px, var(--paper) 14px 26px,
+    var(--air-blue) 26px 40px, var(--paper) 40px 52px);
+  animation:fade .9s ease both;
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+header{padding:16px 0 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.brand b{color:var(--ink);font-weight:700;letter-spacing:.2em}
+.lang{display:flex;gap:0;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.lang button{
+  font:inherit;font-size:11px;letter-spacing:.1em;padding:5px 12px;
+  background:var(--panel);color:var(--ink-2);border:0;cursor:pointer;
+}
+.lang button[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+h1{
+  font-weight:900;font-size:clamp(28px,7.2vw,42px);line-height:1.15;
+  letter-spacing:-.02em;margin:24px 0 12px;
+}
+h1 em{font-style:normal;color:var(--air-red)}
+.lede{font-size:16px;color:var(--ink-2);margin:0 0 6px}
+
+.hero-fee{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  background:var(--hi);border:1px solid #EBC4C0;border-radius:2px;
+  padding:16px 18px;margin:22px 0 0;
+}
+.hero-fee .n{font-family:'Space Mono',monospace;font-size:34px;font-weight:700;color:var(--air-red);line-height:1}
+.hero-fee .t{font-size:14px;color:var(--ink)}
+
+h2{
+  font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2);
+  font-weight:700;margin:42px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule);
+}
+h3{font-size:17px;font-weight:700;margin:0 0 4px}
+p{margin:0 0 14px;color:var(--ink-2)}
+
+.cards{display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:16px 18px}
+.card .tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--air-red);font-weight:700;display:block;margin-bottom:6px}
+.card p{margin:0;font-size:14px}
+
+.steps{display:grid;gap:12px;counter-reset:s}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step::before{
+  counter-increment:s;content:counter(s);
+  font-family:'Space Mono',monospace;font-weight:700;font-size:13px;
+  color:#fff;background:var(--ink);min-width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;margin-top:2px;
+}
+.step p{margin:0;font-size:14px}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+td{padding:11px 4px;border-bottom:1px solid var(--rule);vertical-align:top}
+td.k{width:34%;font-weight:700;color:var(--ink)}
+td.v{width:16%;text-align:right;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap;padding-right:12px}
+td.d{color:var(--ink-2)}
+tr.hi td{background:var(--hi)}
+tr.hi td.k,tr.hi td.v{color:var(--air-red)}
+tr.hi td.d{color:var(--ink)}
+.free{color:var(--ok)}
+
+.dl{display:grid;gap:8px;margin:8px 0 0}
+.dl a{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:13px 16px;background:var(--panel);border:1px solid var(--rule);
+  border-radius:2px;text-decoration:none;color:var(--ink);font-size:14px;font-weight:500;
+  transition:border-color .15s ease;
+}
+.dl a:hover{border-color:var(--ink)}
+.dl a span{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-2)}
+
+.cta{
+  display:block;margin:34px 0 8px;padding:22px;background:var(--ink);
+  color:#fff;text-decoration:none;border-radius:2px;transition:transform .16s ease;
+}
+.cta:hover{transform:translateY(-2px)}
+.cta .kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8FA4C4;display:block;margin-bottom:7px}
+.cta .big{font-size:21px;font-weight:800;line-height:1.3;display:block}
+.cta .small{font-size:13px;color:#B9C7DC;display:block;margin-top:8px;font-family:'Space Mono',monospace}
+
+footer{margin-top:44px;padding:22px 0 44px;border-top:1px solid var(--rule);font-size:12px;color:var(--ink-2)}
+footer a{color:var(--air-blue)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="airmail"></div>
+<div class="wrap">
+
+<header>
+  <div class="brand"><b>Omakase Ship</b> &nbsp;by Play Japan</div>
+  <div class="lang">
+    <button id="bja" aria-pressed="true">日本語</button>
+    <button id="ben" aria-pressed="false">English</button>
+  </div>
+</header>
+
+<h1>
+  <span class="ja-only">お客様の「持ち帰れない」を、<br><em>御社の売上に変えませんか。</em></span>
+  <span class="en-only">Turn "I can't carry this" into<br><em>revenue for your business.</em></span>
+</h1>
+
+<p class="lede ja-only">秋葉原周辺のホテル・ホステル・物販店・飲食店様へ。訪日のお客様の荷物を、当社がご自宅または次のご宿泊先までお送りします。</p>
+<p class="lede en-only">For hotels, hostels, shops and restaurants around Akihabara. We pack and ship your guests' shopping — home overseas, or on to their next hotel in Japan.</p>
+
+<div class="hero-fee">
+  <span class="n">¥500</span>
+  <span class="t ja-only">ご成約1件につきお支払いします。<br>費用0円・契約金なし・作業なし。</span>
+  <span class="t en-only">for every booking from your flyer.<br>No cost, no contract, no work for you.</span>
+</div>
+
+<!-- ───────────────── 誰に向くか ───────────────── -->
+<h2><span class="ja-only">こんな店舗様に向いています</span><span class="en-only">Who this fits</span></h2>
+<div class="cards">
+  <div class="card">
+    <span class="tag ja-only">ホテル・ホステル</span>
+    <span class="tag en-only">Hotels &amp; hostels</span>
+    <p class="ja-only">買い物の「前」にお客様と話せる唯一の場所です。「送れる」とご存知であれば大きな買い物ができます。国内の転送も同じ窓口で承ります。</p>
+    <p class="en-only">The one place that reaches guests before they shop. A guest who knows shipping exists buys the big item. We handle domestic forwarding from the same counter.</p>
+  </div>
+  <div class="card">
+    <span class="tag ja-only">物販店・ホビーショップ</span>
+    <span class="tag en-only">Shops &amp; hobby stores</span>
+    <p class="ja-only">スケールフィギュアや一番くじのA賞など、箱の大きい商品。手に取って、それでも棚に戻すお客様がいます。欲しくない訳ではなく、スーツケースに入らないからです。</p>
+    <p class="en-only">Scale figures, prize items, anything in a big box. Customers pick them up, look, and put them back — not because they don't want them, but because they won't fit in a suitcase.</p>
+  </div>
+  <div class="card">
+    <span class="tag ja-only">飲食店・コンセプトカフェ</span>
+    <span class="tag en-only">Restaurants &amp; concept cafés</span>
+    <p class="ja-only">秋葉原で唯一、お客様が荷物を置いて座る場所です。1時間座って、そこで初めて荷物の重さを実感します。テーブルに1枚あれば、それが答えになります。</p>
+    <p class="en-only">The one place in Akihabara where visitors sit down with their bags. An hour at your table is when the weight of it all sinks in. One flyer answers the question.</p>
+  </div>
+</div>
+
+<!-- ───────────────── 仕組み ───────────────── -->
+<h2><span class="ja-only">お客様がすることは3つだけ</span><span class="en-only">Three steps for your customer</span></h2>
+<div class="steps">
+  <div class="step">
+    <div>
+      <h3><span class="ja-only">お預かり</span><span class="en-only">Drop off</span></h3>
+      <p class="ja-only">秋葉原の当社窓口に、買われた商品をお持ちいただきます。</p>
+      <p class="en-only">They bring their shopping to our counter in Akihabara.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div>
+      <h3><span class="ja-only">梱包・書類</span><span class="en-only">We pack it</span></h3>
+      <p class="ja-only">当社が梱包し、税関告知書を作成します。英語・中国語・韓国語で対応。</p>
+      <p class="en-only">We pack the box and complete the customs declaration. English, Chinese and Korean spoken.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div>
+      <h3><span class="ja-only">発送</span><span class="en-only">It arrives</span></h3>
+      <p class="ja-only">日本郵便で発送。追跡番号をお渡しし、ご自宅までお届けします。</p>
+      <p class="en-only">Sent by Japan Post with tracking, all the way to their door.</p>
+    </div>
+  </div>
+</div>
+<p style="margin-top:16px;font-size:14px;color:var(--ink)">
+  <span class="ja-only">国内の次のご宿泊先へ ¥1,980〜 ／ 海外のご自宅へ ¥4,410〜（米国500g）</span>
+  <span class="en-only">To their next hotel in Japan from ¥1,980 &nbsp;|&nbsp; Home overseas from ¥4,410 (500 g to the USA)</span>
+</p>
+
+<!-- ───────────────── 負担 ───────────────── -->
+<h2><span class="ja-only">ご負担はゼロ、ご紹介料はお支払いします</span><span class="en-only">No cost to you, and we pay a referral fee</span></h2>
+<table>
+  <tr class="hi">
+    <td class="k"><span class="ja-only">ご紹介料</span><span class="en-only">Referral fee</span></td>
+    <td class="v">¥500</td>
+    <td class="d"><span class="ja-only">御社のチラシ経由でご成約1件につき、500円をお支払いします。</span><span class="en-only">We pay ¥500 for every booking that comes from your flyer.</span></td>
+  </tr>
+  <tr>
+    <td class="k"><span class="ja-only">費用</span><span class="en-only">Cost</span></td>
+    <td class="v free">¥0</td>
+    <td class="d"><span class="ja-only">チラシを1枚置いていただくだけです。契約金や初期費用はありません。</span><span class="en-only">Just one flyer. No contract, no setup fee.</span></td>
+  </tr>
+  <tr>
+    <td class="k"><span class="ja-only">作業</span><span class="en-only">Work</span></td>
+    <td class="v free"><span class="ja-only">なし</span><span class="en-only">None</span></td>
+    <td class="d"><span class="ja-only">ご案内・梱包・書類作成・発送は、すべて当社で行います。</span><span class="en-only">We handle the packing, the paperwork and the shipping.</span></td>
+  </tr>
+  <tr>
+    <td class="k"><span class="ja-only">責任</span><span class="en-only">Liability</span></td>
+    <td class="v free"><span class="ja-only">なし</span><span class="en-only">None</span></td>
+    <td class="d"><span class="ja-only">お預かりした後の荷物の一切の責任は、当社が負います。</span><span class="en-only">Once we receive the parcel, it is entirely our responsibility.</span></td>
+  </tr>
+</table>
+
+<!-- ───────────────── 支払い ───────────────── -->
+<h2><span class="ja-only">ご紹介料のお支払い方法</span><span class="en-only">How the referral fee is paid</span></h2>
+<p class="ja-only">チラシの右下に御社専用の店舗コードを印字します。お客様が当社窓口でチラシまたは画面をご提示された時点で1件と数え、月末締め・翌月10日にお振込みいたします。ご成約の明細（日付・件数）は毎月お渡ししますので、いつでもご確認いただけます。ご成約がなかった月のご請求は、当然ながらありません。</p>
+<p class="en-only">Your flyer carries a store code. When a customer shows it at our counter — on paper or on their phone — that counts as one booking. We total them at month end and pay by bank transfer on the 10th of the following month, with an itemised list of dates and counts. Months with no bookings simply cost nothing.</p>
+
+<!-- ───────────────── 資料 ───────────────── -->
+<h2><span class="ja-only">ご提案資料</span><span class="en-only">Full proposal (PDF)</span></h2>
+<div class="dl">
+  <a href="../assets/print/proposal-hotel-a4.pdf">
+    <span class="ja-only">ホテル・ホステル様向け（日英）</span><span class="en-only">For hotels and hostels (JA / EN)</span>
+    <span>PDF · A4</span>
+  </a>
+  <a href="../assets/print/proposal-retail-a4.pdf">
+    <span class="ja-only">物販店・ホビーショップ様向け</span><span class="en-only">For shops and hobby stores</span>
+    <span>PDF · A4</span>
+  </a>
+  <a href="../assets/print/proposal-cafe-a4.pdf">
+    <span class="ja-only">飲食店・コンセプトカフェ様向け</span><span class="en-only">For restaurants and concept cafés</span>
+    <span>PDF · A4</span>
+  </a>
+  <a href="../cost/">
+    <span class="ja-only">料金計算機（お客様向け）</span><span class="en-only">Price calculator (for customers)</span>
+    <span>WEB</span>
+  </a>
+</div>
+
+<!-- ───────────────── 当社 ───────────────── -->
+<h2><span class="ja-only">当社について</span><span class="en-only">About us</span></h2>
+<p class="ja-only">有限会社オーシャン貿易は、東京都公安委員会の古物商許可（第305511207538号）を受けた法人です。代表は秋葉原を中心に13年間、国内外への販売に携わってきました。eBayでの取引実績は5万件を超え、国際発送と通関書類の実務経験があります。個人の副業ではなく、法人として責任を持って運営します。</p>
+<p class="en-only">Ocean Trading Co., Ltd. is a licensed second-hand dealer registered with the Tokyo Metropolitan Public Safety Commission (Licence No. 305511207538). Our representative has worked in retail and export from Akihabara for thirteen years, with over 50,000 transactions on eBay and hands-on experience with customs paperwork.</p>
+
+<a class="cta" href="mailto:gamegamesan@gmail.com?subject=Omakase%20Ship%20%E6%8F%90%E6%90%BA%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6">
+  <span class="kicker"><span class="ja-only">お問い合わせ</span><span class="en-only">Get in touch</span></span>
+  <span class="big"><span class="ja-only">まず1ヶ月、置いてみませんか。</span><span class="en-only">Try one flyer for a month.</span></span>
+  <span class="small">gamegamesan@gmail.com</span>
+</a>
+
+<footer>
+  <span class="ja-only">有限会社オーシャン貿易　東京都豊島区　古物商許可 第305511207538号　担当：梶（かじ）</span>
+  <span class="en-only">Ocean Trading Co., Ltd. · Toshima-ku, Tokyo · Licence No. 305511207538 · Contact: Kaji</span>
+  <br><a href="../">← Omakase Ship</a>
+</footer>
+</div>
+
+<script>
+(function(){
+  var b=document.body,ja=document.getElementById('bja'),en=document.getElementById('ben');
+  function set(lang){
+    var isEn = lang==='en';
+    b.classList.toggle('en',isEn);
+    document.documentElement.lang = isEn?'en':'ja';
+    ja.setAttribute('aria-pressed',String(!isEn));
+    en.setAttribute('aria-pressed',String(isEn));
+  }
+  ja.addEventListener('click',function(){set('ja')});
+  en.addEventListener('click',function(){set('en')});
+  // 初回のみブラウザ言語で判定
+  if(!/^ja/i.test(navigator.language||'')) set('en');
+})();
+</script>
+</body>
+</html>
