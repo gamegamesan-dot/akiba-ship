@@ -1,0 +1,95 @@
+/* ============================================================
+   Omakase Ship — A4 提案書 共通スタイル（3種共通）
+   partner/index.html のデザイン体系を流用。
+   Chrome headless --print-to-pdf 用。@page margin 0 で
+   ヘッダ/フッタ（URL・日付）を抑止し、余白は .sheet 側で管理。
+   ============================================================ */
+:root{
+  --paper:#FFFFFF; --panel:#FFFFFF; --ink:#0E1626; --ink-2:#4A576C;
+  --rule:#C7D1E0; --air-red:#C8352C; --air-blue:#1D4E9C;
+  --stamp:#E4EAF3; --ok:#1B6B4A; --hi:#FDF0EE;
+}
+*{box-sizing:border-box}
+@page{ size:A4; margin:0; }
+html,body{ margin:0; padding:0; background:#fff; }
+body{
+  color:var(--ink);
+  font-family:'Noto Sans JP','Yu Gothic','Hiragino Sans','Archivo',system-ui,sans-serif;
+  font-size:11px; line-height:1.55; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+.mono{font-family:'Space Mono',ui-monospace,monospace}
+
+/* 1シート = A4 1ページ */
+.sheet{
+  position:relative; width:210mm; min-height:297mm;
+  padding:11mm 17mm 10mm; overflow:hidden;
+  display:flex; flex-direction:column;
+  page-break-after:always; break-after:page;
+}
+.sheet > .body{ flex:1 0 auto; }
+.sheet:last-child{ page-break-after:auto; break-after:auto; }
+
+/* エアメール帯（上端・全幅ブリード） */
+.airmail{
+  position:absolute; top:0; left:0; right:0; height:8px;
+  background:repeating-linear-gradient(-45deg,
+    var(--air-red) 0 14px, #fff 14px 26px,
+    var(--air-blue) 26px 40px, #fff 40px 52px);
+}
+
+/* ヘッダ行 */
+.head{ display:flex; justify-content:space-between; align-items:baseline;
+  font-size:10px; color:var(--ink-2); margin:6px 0 14px; }
+.head .co{ font-weight:700; color:var(--ink); }
+
+/* 見出し */
+h1{ font-size:27px; line-height:1.2; font-weight:900; letter-spacing:-.01em; margin:0 0 8px; }
+.sub{ font-size:15px; font-weight:700; color:var(--air-red); margin:0 0 4px; }
+
+.sec{ font-size:14px; font-weight:800; color:var(--air-blue); margin:20px 0 8px; }
+.sec .no{ color:var(--air-blue); }
+
+p{ margin:0 0 9px; color:var(--ink); }
+p.lead{ color:var(--ink); }
+
+/* 淡青ハイライト枠（左ネイビー罫） */
+.hlbox{ background:var(--stamp); border-left:4px solid var(--air-blue);
+  border-radius:2px; padding:12px 16px; margin:12px 0 14px; }
+.hlbox .t{ font-weight:800; font-size:12px; color:var(--ink); margin:0 0 5px; }
+.hlbox p{ margin:0; font-size:10.5px; color:var(--ink-2); }
+
+/* STEP 3列 */
+.steps{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin:4px 0 10px; }
+.step{ border:1px solid var(--rule); border-radius:2px; padding:11px 13px; }
+.step .n{ font-size:9px; letter-spacing:.16em; font-weight:700; color:var(--air-red); }
+.step .h{ font-size:13px; font-weight:800; margin:5px 0 4px; }
+.step p{ margin:0; font-size:10px; color:var(--ink-2); }
+
+.priceline{ font-size:11.5px; color:var(--ink); margin:6px 0 4px; }
+
+/* 料金テーブル */
+.fee{ width:100%; border-collapse:collapse; margin:2px 0 4px; }
+.fee td{ padding:8px 4px; border-bottom:1px solid var(--rule); vertical-align:top; }
+.fee td.k{ width:30%; font-weight:800; color:var(--ink); }
+.fee td.v{ width:16%; font-weight:800; font-family:'Space Mono',monospace; white-space:nowrap; padding-right:10px; }
+.fee td.d{ color:var(--ink-2); font-size:10.5px; }
+.fee tr.hi td{ background:var(--hi); }
+.fee tr.hi td.k, .fee tr.hi td.v{ color:var(--air-red); }
+.fee tr.hi td.d{ color:var(--ink); }
+.fee td.v.g{ color:var(--ok); }
+.fee td.v.r{ color:var(--air-red); }
+
+/* ダーク CTA 帯 */
+.cta{ background:var(--ink); color:#fff; border-radius:2px; padding:16px 20px; margin:18px 0 0; }
+.cta .kick{ font-size:9px; letter-spacing:.2em; color:#8FA4C4; margin:0 0 6px; }
+.cta .big{ font-size:18px; font-weight:800; line-height:1.3; margin:0 0 6px; }
+.cta .sm{ font-size:11px; color:#B9C7DC; margin:0; }
+
+/* フッター（フローの最下部へ） */
+.foot{ margin-top:auto; padding-top:14px;
+  display:flex; justify-content:space-between; align-items:flex-end;
+  border-top:1px solid var(--rule); font-size:10px; color:var(--ink-2); }
+.foot .brand{ font-weight:800; color:var(--ink); font-size:12px; }
+.foot .l div, .foot .r div{ margin-top:2px; }
+.foot .r{ text-align:right; }
+.foot a{ color:var(--air-blue); text-decoration:none; }
