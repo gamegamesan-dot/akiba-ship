@@ -14,7 +14,10 @@
 html,body{ margin:0; padding:0; background:#fff; }
 body{
   color:var(--ink);
-  font-family:'Noto Sans JP','Yu Gothic','Hiragino Sans','Archivo',system-ui,sans-serif;
+  /* ラテンは Archivo、日本語はシステムの BIZ UDGothic を使用。
+     Google Fonts の Noto(CJK) は unicode-range 分割で Type3 が大量埋め込みされ肥大するため使わない。
+     Archivo を先頭に置くとラテンは Archivo、日本語グリフは Archivo に無いため BIZ UDGothic へ落ちる。 */
+  font-family:'Archivo','BIZ UDGothic','Yu Gothic','Meiryo','Hiragino Sans',system-ui,sans-serif;
   font-size:11px; line-height:1.55; -webkit-print-color-adjust:exact; print-color-adjust:exact;
 }
 .mono{font-family:'Space Mono',ui-monospace,monospace}
