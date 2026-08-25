@@ -475,7 +475,8 @@ function drawInternational(code, contents){
   $('svcTag').textContent = 'COMPARE';
   $('feeNote').textContent =
     `All prices include ${yen(base)} for packing, the customs form and the shipping label. `
-    + `Billed on packed weight ${packed} g (your ${(contents/1000).toFixed(2)} kg plus protective packing).`;
+    + `Billed on packed weight ${packed} g (your ${(contents/1000).toFixed(2)} kg plus protective packing).`
+    + ` A box up to 100 size is included. Larger boxes are charged at cost (¥300–¥800).`;
 
   const sh=$('sizeHint');
   if(size){
@@ -527,7 +528,8 @@ function drawDomestic(code, contents){
   $('svcTag').textContent = 'WITHIN JAPAN';
   $('feeNote').textContent =
     `Domestic delivery to your hotel in Japan via ${q.courier}. ${yen(q.base)} is an estimate — the final price `
-    + `depends on region and box size. Limit: ${R.DOMESTIC.maxSizeCm} cm (3 sides total) and ${R.DOMESTIC.maxKg} kg.`;
+    + `depends on region and box size. Limit: ${R.DOMESTIC.maxSizeCm} cm (3 sides total) and ${R.DOMESTIC.maxKg} kg.`
+    + ` Boxes up to 100 size are included; larger boxes cost ¥300–¥800.`;
 
   const sh=$('sizeHint');
   if(size){
