@@ -323,7 +323,7 @@ footer a{color:var(--air-blue)}
 <p>That depends on your country and what's in the box. Personal goods below your country's duty-free threshold usually clear without a charge. We declare contents honestly on the customs form — under-declaring is what gets parcels seized.</p>
 
 <h3>Do I need to prepay US import duty?</h3>
-<p>For parcels to the United States, yes. Since the US ended duty-free treatment for low-value mail, anything worth more than about US$100 needs the import duty paid in advance, before we mail it — it is not included in the price above. Personal gifts and documents up to US$100 are exempt. We handle the prepayment process with you. (Last confirmed 2026-08-07.)</p>
+<p>For parcels to the United States, it depends on the declared value. Personal gifts and documents up to about US$100 are exempt. Between roughly US$100 and US$800, the import duty is prepaid before we mail it — it is not in the price above, and we handle it with you. Above about US$800 there is nothing to prepay here; the recipient in the US is billed for the duty when the parcel arrives. As a guide, the prepaid amount is about the declared value × 13.74% + ¥562 (12.5% duty, plus a customs handling charge of a fixed ¥562 + 1.24% of the value): a ¥5,000 declared value comes to about ¥1,249, and ¥10,000 about ¥1,936. Because of the fixed ¥562, one small item sent on its own costs proportionally more, so combining several items in one parcel lowers the cost per item. (Last confirmed 2026-09-05.)</p>
 
 <h3>What can't be shipped?</h3>
 <p>Lithium batteries on their own, aerosols, alcohol above 24%, and anything flammable. Devices with a battery sealed inside, like a camera or a handheld console, are fine.</p>
@@ -499,10 +499,10 @@ function drawInternational(code, contents){
   const duty=$('dutyNotice');
   if(c.code==='US'){
     duty.hidden=false;
-    duty.innerHTML='<b>Shipping to the United States:</b> US import duty is paid in advance and is '
-      +'<b>not included in this estimate</b>. Parcels over about US$100 need duty prepaid before mailing; '
-      +'personal gifts and documents up to US$100 are exempt. We’ll walk you through it. '
-      +'<span class="mono">(Last confirmed 2026-08-07.)</span>';
+    duty.innerHTML='<b>Shipping to the United States:</b> Import duty is prepaid before mailing and is '
+      +'<b>not included in this estimate</b> — parcels under about US$100 are exempt, and above about US$800 '
+      +'the recipient pays on arrival instead. As a rough guide it is the declared value × 13.74% + ¥562, '
+      +'so combining items in one parcel lowers the per-item cost. See the FAQ below for the full breakdown.';
   } else {
     duty.hidden=true; duty.innerHTML='';
   }
@@ -567,7 +567,7 @@ draw();
     {"@type":"Question","name":"How long does it take to ship from Japan to the USA?",
      "acceptedAnswer":{"@type":"Answer","text":"Air parcel takes 6 to 13 days. EMS, used for parcels over 2 kg, takes 4 to 7 days. Both are trackable."}},
     {"@type":"Question","name":"Do I need to prepay US import duty on a parcel from Japan?",
-     "acceptedAnswer":{"@type":"Answer","text":"For parcels to the United States, import duty on anything worth more than about US$100 must be prepaid before mailing and is not included in the shipping price. Personal gifts and documents up to US$100 are exempt. Last confirmed 2026-08-07."}},
+     "acceptedAnswer":{"@type":"Answer","text":"For parcels to the United States it depends on the declared value. Personal gifts and documents up to about US$100 are exempt. Between roughly US$100 and US$800 the import duty is prepaid before mailing and is not included in the shipping price. Above about US$800 nothing is prepaid in Japan; the US recipient is billed for the duty when the parcel arrives. As a guide the prepaid amount is about the declared value × 13.74% + 562 yen (12.5% duty plus a customs handling charge of 562 yen fixed + 1.24% of the value): a 5,000 yen value comes to about 1,249 yen and 10,000 yen about 1,936 yen. Because of the fixed 562 yen, combining several items in one parcel lowers the cost per item. Last confirmed 2026-09-05."}},
     {"@type":"Question","name":"Will I pay import duty on a parcel from Japan?",
      "acceptedAnswer":{"@type":"Answer","text":"It depends on your country and the contents. Personal goods below your country's duty-free threshold usually clear without a charge. Contents are declared honestly on the customs form."}},
     {"@type":"Question","name":"Can you deliver my shopping to my hotel in Japan?",
