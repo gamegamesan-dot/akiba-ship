@@ -56,6 +56,9 @@ var CONFIG = {
 
 - 送料は日本郵便公式（**取得日 2026-08-07**、出典URLは `rates.js` 冒頭コメント）。値上げ時はここを差し替え。
 - **`rates.js` を変更したら、`cost/` の静的表と JSON-LD の数値、および `assets/print/` のPDFを再生成/更新すること**（静的数値はスクリプトで再計算し手打ちしない）。
+- あわせて **`tools/flyer/gen_flyer.py` の価格を更新し、チラシPDFを再作成すること**（`gen_flyer.py` は価格をハードコードしており `rates.js` とは手動同期）。
+
+> 同じ日本郵便の料金表を `pj_price/index.html` の AIR / EMS 定数でも保持しています。値上げ時は両方を更新してください。
 
 ## 公開手順(GitHub Pages)
 
