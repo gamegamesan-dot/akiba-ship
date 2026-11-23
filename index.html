@@ -84,6 +84,11 @@ select:focus,input:focus{outline:2px solid var(--navy);outline-offset:-1px;backg
 .btn.line{background:#06c755;color:#fff}
 .btn.wa{background:#25d366;color:#fff}
 .btn.mail{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+/* 予約（Google フォーム）がいちばん目立つボタン。質問の連絡先は小さく残す。 */
+.btn.book{background:var(--red);color:#fff;font-size:17px;padding:17px}
+.herobook{display:block;margin-top:16px;max-width:420px}
+.ask{margin-top:14px;font-size:13px;color:var(--ink2)}
+.ask a{display:inline-block;margin:6px 10px 0 0;font-weight:700;color:var(--navy)}
 
 footer{margin-top:34px;background:var(--ink);color:#8d939c;padding:22px 0 calc(26px + env(safe-area-inset-bottom));font-size:12.5px;line-height:1.7}
 footer b{color:#e7e3da}
@@ -114,6 +119,7 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
     <div class="kicker">AKIHABARA · TOKYO</div>
     <h1 data-i18n="h1"></h1>
     <p class="lede" data-i18n="lede"></p>
+    <a class="btn book herobook" id="btnBookHero" href="#" target="_blank" rel="noopener" data-i18n="btn_book"></a>
     <a class="herolink" href="./cost/" data-i18n="heroPriceLink"></a>
   </div>
 </header>
@@ -198,9 +204,13 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
         <div class="sub" id="estSub"></div>
       </div>
 
-      <a class="btn wa" id="btnWa" href="#" data-i18n="btn_wa"></a>
-      <a class="btn line" id="btnLine" href="#" data-i18n="btn_line"></a>
-      <a class="btn mail" id="btnMail" href="#" data-i18n="btn_mail"></a>
+      <a class="btn book" id="btnBook" href="#" target="_blank" rel="noopener" data-i18n="btn_book"></a>
+      <p class="small" style="margin:8px 0 0" data-i18n="book_note"></p>
+      <div class="ask"><span data-i18n="q_ask"></span><br>
+        <a id="btnWa" href="#" data-i18n="btn_wa"></a>
+        <a id="btnLine" href="#" data-i18n="btn_line"></a>
+        <a id="btnMail" href="#" data-i18n="btn_mail"></a>
+      </div>
       <p class="small" style="margin-top:12px" data-i18n="q_note"></p>
     </div>
   </section>
@@ -244,6 +254,55 @@ var CONFIG = {
   email:    "hello@example.com"
 };
 
+/* 予約フォーム（Google フォーム）。料金の目安で選んだ内容と紹介コードを入れて開く
+   （usp=pp_url の事前入力）。選択肢の文字は**フォームと完全一致**（– は en ダッシュ U+2013）。 */
+var FORM = {
+  url: "https://docs.google.com/forms/d/e/1FAIpQLSeJqHE1Zn3QOHQhHUtQnI4l_mDOnMgi03iKkbGV1g6y1o3V2w/viewform",
+  country: "entry.68402568",
+  size:    "entry.314454876",
+  pack:    "entry.1194186612",
+  ref:     "entry.2128966062"
+};
+/* 送り先：LP の選択（ゾーン）→ フォームの国。1か国に決まらないものは Other。 */
+var FORM_COUNTRY = { "4":"United States" };
+var FORM_OTHER = "Other (please write below)";
+/* 大きさ：LP の重さ → フォームの大きさ（2kg 以下＝Small、それより重い＝Medium）。 */
+function formSizeOf(grams){
+  return (+grams<=2000) ? "Small \u2013 fits in a shoebox (about 2 kg or less)"
+                        : "Medium \u2013 about the size of a backpack";
+}
+var FORM_PACK = {
+  box: "Box (best protection)",
+  env: "Padded envelope (lighter, cheaper postage \u2013 for small, non-fragile items)"
+};
+/* 紹介コード（tracking.js が ?s= から omakase_ref に保存したもの）。無ければ ''。 */
+function refCode(){
+  var re=/^[A-Z]{2}\d{2,3}$/;
+  /* 先に保存済みのコード（初回の紹介元を優先・tracking.js と同じ決まり）、
+     無ければ今の URL の ?s=（初めて開いた回は tracking.js がこのあとで保存するため）。 */
+  try{
+    var o=JSON.parse(localStorage.getItem("omakase_ref")||"null");
+    var c=o&&String(o.code||"");
+    if(re.test(c)) return c;
+  }catch(e){}
+  try{
+    var s=new URLSearchParams(location.search).get("s");
+    s=s?String(s):"";                       // tracking.js と同じ（そのままの形で確かめる）
+    if(re.test(s)) return s;
+  }catch(e){}
+  return "";
+}
+function formUrl(){
+  var q=[["usp","pp_url"],
+         [FORM.country, FORM_COUNTRY[$("dest").value] || FORM_OTHER],
+         [FORM.size, formSizeOf($("wt").value)],
+         [FORM.pack, FORM_PACK[$("packing").value] || FORM_PACK.box]];
+  var rc=refCode();
+  if(rc) q.push([FORM.ref, rc]);
+  return FORM.url+"?"+q.map(function(x){
+    return encodeURIComponent(x[0])+"="+encodeURIComponent(x[1]); }).join("&");
+}
+
 var I18N = {
 en:{
  pack_over:"Over 5 kg — please message us for a quote.",
@@ -259,7 +318,7 @@ en:{
  ship_h:"Two ways to send it home", ship_intl:"International shipping", ship_hotel:"Hotel delivery (within Japan)",
  ship_note:"Staying a few more nights? We can forward your haul to your next hotel in Japan, or ship it to your home country. Prices are starting points.",
  how_h:"How it works",
- s1t:"Message us", s1b:"Tell us your destination country and roughly how much you bought. We reply with a firm quote.",
+ s1t:"Book a drop-off", s1b:"Fill in a short form with your destination, size and packing. We email you to confirm where and when to drop off.",
  s2t:"Hand over your bags", s2b:"Meet us in Akihabara, or send them to us from your hotel. We check and repack everything properly.",
  s3t:"We do the paperwork", s3b:"Japan Post no longer accepts handwritten customs labels, and the online system is Japanese-only. We handle it, in your name, correctly.",
  s4t:"Choose your ship date", s4b:"Leave it with us and travel light. Tell us when to send — we post it and give you the tracking number.",
@@ -271,7 +330,10 @@ en:{
  quote_h:"Estimate",
  q_dest:"Where are we sending it?", q_weight:"Roughly how heavy?", q_days:"Days you want us to hold it",
  q_est:"ESTIMATED TOTAL",
- btn_wa:"Ask on WhatsApp", btn_line:"Ask on LINE", btn_mail:"Ask by email",
+ btn_book:"Book a drop-off",
+ book_note:"Opens a short Google Form with your choices filled in. We confirm the drop-off place and time by email.",
+ q_ask:"Questions first? Ask us:",
+ btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
  q_note:"Estimate only. Final price depends on actual weight and box size after repacking. Postage is charged at cost — we don't mark it up.",
  tax_h:"Please read first",
  tax_t:"Shipping means no tax refund on those items",
@@ -296,7 +358,7 @@ en:{
  ship_h:"兩種寄回家的方式", ship_intl:"國際寄送", ship_hotel:"飯店配送（日本國內）",
  ship_note:"還要多住幾晚？我們可以把戰利品轉送到你在日本的下一間飯店，或寄回你的國家。顯示為起始價。",
  how_h:"服務流程",
- s1t:"先傳訊息給我們", s1b:"告訴我們寄送國家與大概的數量，我們回覆確定金額。",
+ s1t:"預約交件", s1b:"填寫簡短表單（寄送國家、大小、包裝方式）。我們會以電子郵件確認交件地點與時間。",
  s2t:"把東西交給我們", s2b:"在秋葉原面交，或從飯店寄給我們。我們會逐一確認並重新包裝。",
  s3t:"報關手續由我們處理", s3b:"日本郵局已不接受手寫報關單，線上系統只有日文。我們以你的名義正確填寫。",
  s4t:"自己決定寄出日", s4b:"東西放我們這裡，你輕鬆繼續玩。想寄的時候告訴我們，寄出後提供追蹤號碼。",
@@ -308,7 +370,10 @@ en:{
  quote_h:"費用試算",
  q_dest:"寄到哪裡？", q_weight:"大概多重？", q_days:"希望我們保管幾天",
  q_est:"預估總金額",
- btn_wa:"用 WhatsApp 詢問", btn_line:"用 LINE 詢問", btn_mail:"用 Email 詢問",
+ btn_book:"預約交件（Book a drop-off）",
+ book_note:"開啟已填入您選擇內容的 Google 表單。交件地點與時間會以電子郵件確認。",
+ q_ask:"想先問問題？請聯絡我們：",
+ btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
  q_note:"僅為預估。實際金額依重新包裝後的重量與箱子尺寸而定。郵資照實收，不加價。",
  tax_h:"請務必先閱讀",
  tax_t:"寄回國的商品無法退稅",
@@ -333,7 +398,7 @@ en:{
  ship_h:"两种寄回家的方式", ship_intl:"国际寄送", ship_hotel:"酒店配送（日本国内）",
  ship_note:"还要多住几晚？我们可以把战利品转送到你在日本的下一家酒店，或寄回你的国家。显示为起始价。",
  how_h:"服务流程",
- s1t:"先给我们发消息", s1b:"告诉我们寄送国家和大概数量，我们回复确定金额。",
+ s1t:"预约交件", s1b:"填写简短表单（寄送国家、大小、包装方式）。我们会通过电子邮件确认交件地点和时间。",
  s2t:"把东西交给我们", s2b:"在秋叶原面交，或从酒店寄给我们。我们会逐一确认并重新包装。",
  s3t:"报关手续由我们处理", s3b:"日本邮局已不接受手写报关单，线上系统只有日文。我们以你的名义正确填写。",
  s4t:"自己决定寄出日", s4b:"东西放我们这里，你可以轻装继续玩。想寄时告诉我们，寄出后提供追踪号。",
@@ -345,7 +410,10 @@ en:{
  quote_h:"费用试算",
  q_dest:"寄到哪里？", q_weight:"大概多重？", q_days:"希望我们保管几天",
  q_est:"预估总金额",
- btn_wa:"用 WhatsApp 咨询", btn_line:"用 LINE 咨询", btn_mail:"用 Email 咨询",
+ btn_book:"预约交件（Book a drop-off）",
+ book_note:"打开已填入您所选内容的 Google 表单。交件地点和时间会通过电子邮件确认。",
+ q_ask:"想先咨询？请联系我们：",
+ btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
  q_note:"仅为预估。实际金额依重新包装后的重量与箱子尺寸而定。邮资照实收，不加价。",
  tax_h:"请务必先阅读",
  tax_t:"寄回国的商品无法退税",
@@ -370,7 +438,7 @@ ko:{
  ship_h:"집으로 보내는 두 가지 방법", ship_intl:"해외 배송", ship_hotel:"호텔 배송(일본 국내)",
  ship_note:"며칠 더 머무시나요? 다음 호텔로 전달하거나 본국으로 발송해 드립니다. 표시는 시작 가격입니다.",
  how_h:"이용 방법",
- s1t:"먼저 메시지 주세요", s1b:"배송 국가와 대략적인 양을 알려주시면 확정 금액을 안내해 드립니다.",
+ s1t:"맡기기 예약", s1b:"배송 국가·크기·포장 방법을 짧은 양식에 입력해 주세요. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
  s2t:"짐을 맡겨주세요", s2b:"아키하바라에서 직접 전달하거나 호텔에서 보내주세요. 하나하나 확인 후 다시 포장합니다.",
  s3t:"통관 서류는 저희가", s3b:"일본우편은 손으로 쓴 통관 라벨을 더 이상 받지 않으며, 온라인 시스템은 일본어뿐입니다. 고객님 명의로 정확히 작성합니다.",
  s4t:"발송일은 직접 결정", s4b:"맡겨두고 가볍게 여행하세요. 보낼 때 알려주시면 발송 후 운송장 번호를 드립니다.",
@@ -382,7 +450,10 @@ ko:{
  quote_h:"예상 요금",
  q_dest:"어디로 보내시나요?", q_weight:"대략 무게는?", q_days:"보관 희망 일수",
  q_est:"예상 합계",
- btn_wa:"WhatsApp으로 문의", btn_line:"LINE으로 문의", btn_mail:"이메일로 문의",
+ btn_book:"맡기기 예약하기 (Book a drop-off)",
+ book_note:"선택하신 내용이 입력된 Google 양식이 열립니다. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
+ q_ask:"먼저 궁금한 점이 있으신가요? 문의하기:",
+ btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"이메일",
  q_note:"예상 금액입니다. 재포장 후 실제 무게와 박스 크기에 따라 확정됩니다. 우편 요금은 실비로만 청구합니다.",
  tax_h:"먼저 확인해 주세요",
  tax_t:"발송한 물건은 면세 환급을 받을 수 없습니다",
@@ -407,7 +478,7 @@ ja:{
  ship_h:"2つの送り方", ship_intl:"海外発送", ship_hotel:"ホテル配送（日本国内）",
  ship_note:"まだ滞在が続きますか？次のホテルへお届けするか、ご自宅の国へ発送します。表示は最低料金です。",
  how_h:"ご利用の流れ",
- s1t:"まずご連絡ください", s1b:"送り先の国とおおよその量をお知らせいただければ、確定金額をご案内します。",
+ s1t:"預け入れを予約", s1b:"送り先の国・大きさ・梱包の方法を短いフォームに入れてください。預け入れの場所と時間は、予約確認メールでお知らせします。",
  s2t:"荷物をお預けください", s2b:"秋葉原で直接お渡しいただくか、ホテルからお送りください。中身を確認して梱包し直します。",
  s3t:"通関書類は当方で作成", s3b:"日本郵便は手書きラベルを受け付けておらず、オンラインシステムは日本語のみです。お客様名義で正確に作成します。",
  s4t:"発送日はお客様が決定", s4b:"預けたまま身軽に観光できます。発送のご連絡をいただき次第、追跡番号をお伝えします。",
@@ -419,7 +490,10 @@ ja:{
  quote_h:"料金の目安",
  q_dest:"送り先", q_weight:"おおよその重量", q_days:"お預かり希望日数",
  q_est:"概算合計",
- btn_wa:"WhatsAppで相談", btn_line:"LINEで相談", btn_mail:"メールで相談",
+ btn_book:"預け入れを予約する（Book a drop-off）",
+ book_note:"選んだ内容が入った Google フォームが開きます。預け入れの場所と時間は、予約確認メールでお知らせします。",
+ q_ask:"先に質問したい方はこちら：",
+ btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"メール",
  q_note:"概算です。梱包後の実重量と箱のサイズで確定します。郵送料は実費のみで、上乗せはしません。",
  tax_h:"必ずお読みください",
  tax_t:"発送した商品は免税の対象外になります",
@@ -482,15 +556,18 @@ function calc(){
   if(!q){
     $("estVal").textContent="—";
     $("estSub").textContent = (I18N[lang].pack_over || I18N.en.pack_over);
+    $("btnBook").href = $("btnBookHero").href = formUrl();
     return;
   }
 
   var total = R.handling + pk.cost + storage + q.postage;
   $("estVal").textContent = "¥"+total.toLocaleString();
 
+  /* Shopify の商品・予約フォームと同じ書き方（取扱手数料＋梱包の合計。計算は変えない）。 */
   var parts = [
-    "Handling ¥"+R.handling.toLocaleString(),
-    "Packing ¥"+pk.cost.toLocaleString(),
+    "Service fee ¥"+(R.handling+pk.cost).toLocaleString()
+      +($("packing").value==="env" ? " (packing, padded envelope, customs form)"
+                                   : " (packing, box, padding, customs form)"),
     q.label+" ¥"+q.postage.toLocaleString()+" ("+packed+"g)",
     storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-R.freeDays)+"d)"
               : "Storage free ("+R.freeDays+"d incl.)"
@@ -525,7 +602,13 @@ function buildLinks(total, q, packed){
           + "Packing: "+packTxt+"\n"
           + "Hold for: "+days+" days\n"
           + "Estimate shown: ¥"+total.toLocaleString()+" ("+q.label+", billed at "+packed+"g)";
+  /* 紹介コード（?s= で保存したもの）も本文に入れる。 */
+  var rc=refCode();
+  if(rc) msg += "\nReferral code: "+rc;
   var enc=encodeURIComponent(msg);
+  var fu=formUrl();
+  $("btnBook").href = fu;
+  $("btnBookHero").href = fu;
   $("btnWa").href  = "https://wa.me/"+CONFIG.whatsapp+"?text="+enc;
   $("btnLine").href= "https://line.me/R/ti/p/@"+CONFIG.lineId;
   $("btnMail").href= "mailto:"+CONFIG.email+"?subject="+encodeURIComponent("Shipping quote request")+"&body="+enc;

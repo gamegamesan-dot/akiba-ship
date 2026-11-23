@@ -35,6 +35,25 @@ var CONFIG = {
 
 > 料金は `CONFIG` にはありません。すべて `rates.js` にあります（下記）。
 
+## 予約フォーム（入口）
+
+いちばん目立つボタンは「**予約する（Book a drop-off）**」で、Google フォームを開きます
+（`index.html` の `FORM`）。WhatsApp・LINE・メールは「質問はこちら」として小さく残しています。
+
+料金の目安で選んだ内容と紹介コードを、`usp=pp_url` の事前入力で入れて開きます。
+選択肢の文字は**フォームと完全一致**にしてあります（`–` は en ダッシュ U+2013）。
+フォームの選択肢を変えたら `FORM_COUNTRY`・`formSizeOf`・`FORM_PACK` も合わせてください。
+
+| フォームの項目 | entry | LP から入れる値 |
+|---|---|---|
+| 送り先の国 | `entry.68402568` | United States は「United States」。地域でまとめた選択肢（Europe / Canada / Australia など）は1か国に決まらないので「Other (please write below)」 |
+| 大きさ | `entry.314454876` | 重さ 2kg 以下 →「Small – fits in a shoebox (about 2 kg or less)」、3kg 以上 →「Medium – about the size of a backpack」 |
+| 梱包 | `entry.1194186612` | 箱 →「Box (best protection)」、封筒 →「Padded envelope (lighter, cheaper postage – for small, non-fragile items)」 |
+| 紹介コード | `entry.2128966062` | `?s=` で保存した紹介元のコード（`omakase_ref`）。無ければ入れない |
+
+紹介コードは WhatsApp・メールの本文にも「Referral code: ◯◯」で入ります。
+住所・部屋番号は LP に書きません（受付場所は予約確認メールで伝えます）。
+
 ## 料金の変更は `rates.js` だけ
 
 料金・送料・サイズ制限・各種係数は **`rates.js`（`window.AKIBA_RATES`）が唯一の正**。LP と `cost/` の両方がここを参照します。
