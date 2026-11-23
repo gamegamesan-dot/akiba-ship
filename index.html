@@ -78,6 +78,7 @@ select:focus,input:focus{outline:2px solid var(--navy);outline-offset:-1px;backg
 .est .lbl{font-size:11px;letter-spacing:.14em;color:#9aa0aa;font-weight:700}
 .est .v{font-size:27px;font-weight:800;margin-top:2px;letter-spacing:-.01em}
 .est .sub{font-size:12.5px;color:#9aa0aa;margin-top:4px;line-height:1.55}
+.est .duty{color:#e3e6ec;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.18)}
 
 .btn{display:block;width:100%;text-align:center;text-decoration:none;padding:15px;
   border-radius:3px;font-weight:800;font-size:16px;margin-top:9px;border:0;font-family:inherit}
@@ -203,6 +204,7 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
         <div class="lbl" data-i18n="q_est"></div>
         <div class="v num" id="estVal">—</div>
         <div class="sub" id="estSub"></div>
+        <div class="sub duty" id="usDuty" hidden></div>
       </div>
 
       <a class="btn book" id="btnBook" href="#" target="_blank" rel="noopener" data-i18n="btn_book"></a>
@@ -335,6 +337,7 @@ en:{
  w4:"We ship internationally from Akihabara every single day. This is our normal work, not a favour.",
  quote_h:"Estimate",
  q_dest:"Where are we sending it?", q_weight:"Roughly how heavy?", q_days:"Days you want us to hold it",
+ us_duty:"+ US import fees (prepaid via Zonos): about item value × {rate} + {fixed} (e.g. items worth {exv} → about {ex}). We will tell you the exact amount at drop-off, worked out from the declared value of your items.",
  q_est:"ESTIMATED TOTAL",
  btn_book:"Book a drop-off",
  book_note:"Opens a short Google Form with your choices filled in. We confirm the drop-off place and time by email.",
@@ -375,6 +378,7 @@ en:{
  w4:"我們每天都從秋葉原寄國際包裹。這是我們的日常工作，不是幫忙。",
  quote_h:"費用試算",
  q_dest:"寄到哪裡？", q_weight:"大概多重？", q_days:"希望我們保管幾天",
+ us_duty:"＋ 美國進口費用（透過 Zonos 預付）：約為 物品金額 × {rate} ＋ {fixed}（例：物品 {exv} 約 {ex}）。正確金額會在收件時，依物品的申報金額計算後告知您。",
  q_est:"預估總金額",
  btn_book:"預約交件（Book a drop-off）",
  book_note:"開啟已填入您選擇內容的 Google 表單。交件地點與時間會以電子郵件確認。",
@@ -415,6 +419,7 @@ en:{
  w4:"我们每天都从秋叶原寄国际包裹。这是我们的日常工作。",
  quote_h:"费用试算",
  q_dest:"寄到哪里？", q_weight:"大概多重？", q_days:"希望我们保管几天",
+ us_duty:"＋ 美国进口费用（通过 Zonos 预付）：约为 物品金额 × {rate} ＋ {fixed}（例：物品 {exv} 约 {ex}）。准确金额会在收件时，根据物品的申报金额计算后告知您。",
  q_est:"预估总金额",
  btn_book:"预约交件（Book a drop-off）",
  book_note:"打开已填入您所选内容的 Google 表单。交件地点和时间会通过电子邮件确认。",
@@ -455,6 +460,7 @@ ko:{
  w4:"저희는 매일 아키하바라에서 국제 배송을 합니다. 특별한 일이 아니라 일상 업무입니다.",
  quote_h:"예상 요금",
  q_dest:"어디로 보내시나요?", q_weight:"대략 무게는?", q_days:"보관 희망 일수",
+ us_duty:"＋ 미국 수입 비용(Zonos로 선불): 물품 금액 × {rate} ＋ {fixed} 정도(예: 물품 {exv}이면 약 {ex}). 정확한 금액은 맡기실 때 물품의 신고 금액으로 계산해 알려 드립니다.",
  q_est:"예상 합계",
  btn_book:"맡기기 예약하기 (Book a drop-off)",
  book_note:"선택하신 내용이 입력된 Google 양식이 열립니다. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
@@ -495,6 +501,7 @@ ja:{
  w4:"当方は毎日、秋葉原から国際発送を行っています。特別な作業ではなく日常業務です。",
  quote_h:"料金の目安",
  q_dest:"送り先", q_weight:"おおよその重量", q_days:"お預かり希望日数",
+ us_duty:"＋ 米国の輸入の費用（Zonos で前払い）：品物の金額 × {rate} ＋ {fixed} が目安（例：品物 {exv} なら 約 {ex}）。正確な金額は、お預かりのときに品物の申告額から出してお伝えします。",
  q_est:"概算合計",
  btn_book:"預け入れを予約する（Book a drop-off）",
  book_note:"選んだ内容が入った Google フォームが開きます。預け入れの場所と時間は、予約確認メールでお知らせします。",
@@ -551,6 +558,20 @@ document.querySelectorAll("#langs button").forEach(function(b){
 function fill(tpl,o){
   return String(tpl||"").replace(/\{(\w+)\}/g,function(m,k){ return (o[k]!==undefined)?o[k]:m; });
 }
+/* 米国を選んだときだけ、合計の下に輸入の費用（Zonos の前払い）の目安を1行出す。
+   合計（送料＋Service fee）には足さない。式と例は rates.js の usDuty から出す。 */
+function showUsDuty(c, t){
+  var el=$("usDuty"), d=R.usDuty;
+  if(!c || c.code!=="US" || !d){ el.hidden=true; el.textContent=""; return; }
+  var yen=function(n){ return "¥"+Math.round(n).toLocaleString(); };
+  el.textContent = fill(t.us_duty||I18N.en.us_duty, {
+    rate: (Math.round(d.rate*10000)/100)+"%",
+    fixed: yen(d.fixed),
+    exv: yen(d.example),
+    ex: yen(d.example*d.rate+d.fixed)
+  });
+  el.hidden=false;
+}
 function calc(){
   var t=I18N[lang]||I18N.en;
   var pk=pick(), q=pk.q, days=+$("days").value;
@@ -564,6 +585,7 @@ function calc(){
   /* 大きさの注記：小形包装物になるときはその条件、EMS になるときは EMS の上限。 */
   $("sizeNote").textContent = pk.small ? (t.size_note_small||I18N.en.size_note_small)
                                        : fill(t.size_note_ems||I18N.en.size_note_ems, limTxt);
+  showUsDuty(pk.c, t);
   if(!q){
     $("estVal").textContent="—";
     $("estSub").textContent = fill(t.pack_over || I18N.en.pack_over, limTxt);
