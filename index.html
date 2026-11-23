@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Omakase Ship — Travel Japan hands-free</title>
-<meta name="description" content="Buy big in Akihabara — we pack it, handle the customs form and ship it home. From ¥4,410 to the USA.">
+<meta name="description" content="Figures and boxes too big for your suitcase? Drop them off in Akihabara — we pack them into one box, handle the customs form and ship it home.">
 <meta name="theme-color" content="#16181d">
 <style>
 :root{
@@ -167,28 +167,29 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
     <h2 data-i18n="quote_h"></h2>
     <div class="card">
       <label class="f" data-i18n="q_dest"></label>
-      <select id="dest">
-        <option value="4">United States</option>
-        <option value="3">Europe / Canada / Australia</option>
-        <option value="2">Asia (SE Asia, India, etc.)</option>
-        <option value="1">Taiwan / Hong Kong / Korea / China</option>
-      </select>
+      <select id="dest"><!-- rates.js の COUNTRIES から作る --></select>
 
       <label class="f" data-i18n="q_weight"></label>
       <select id="wt">
         <option value="500">～0.5 kg</option>
-        <option value="1000" selected>～1 kg</option>
+        <option value="1000">～1 kg</option>
         <option value="2000">～2 kg</option>
         <option value="3000">～3 kg</option>
-        <option value="4000">～4 kg</option>
+        <option value="5000" selected>～5 kg</option>
+        <option value="7000">～7 kg</option>
+        <option value="10000">～10 kg</option>
+        <option value="15000">～15 kg</option>
+        <option value="20000">～20 kg</option>
+        <option value="25000">～25 kg</option>
+        <option value="30000">～30 kg</option>
       </select>
 
-      <label class="f" data-i18n="q_pack"></label>
-      <select id="packing">
-        <option value="box" selected data-i18n-opt="pack_box"></option>
-        <option value="env" data-i18n-opt="pack_env"></option>
+      <label class="f" data-i18n="q_size"></label>
+      <select id="over90">
+        <option value="0" selected data-i18n-opt="size_small"></option>
+        <option value="1" data-i18n-opt="size_big"></option>
       </select>
-      <p class="small" id="packNote" style="margin:6px 0 0"></p>
+      <p class="small" id="sizeNote" style="margin:6px 0 0"></p>
 
       <label class="f" data-i18n="q_days"></label>
       <select id="days">
@@ -260,21 +261,31 @@ var FORM = {
   url: "https://docs.google.com/forms/d/e/1FAIpQLSeJqHE1Zn3QOHQhHUtQnI4l_mDOnMgi03iKkbGV1g6y1o3V2w/viewform",
   country: "entry.68402568",
   size:    "entry.314454876",
-  pack:    "entry.1194186612",
   ref:     "entry.2128966062"
 };
-/* 送り先：LP の選択（ゾーン）→ フォームの国。1か国に決まらないものは Other。 */
-var FORM_COUNTRY = { "4":"United States" };
+/* 送り先：フォームに国名の選択肢がある国は国名（rates.js の COUNTRIES の form）、
+   それ以外は Other。 */
 var FORM_OTHER = "Other (please write below)";
-/* 大きさ：LP の重さ → フォームの大きさ（2kg 以下＝Small、それより重い＝Medium）。 */
-function formSizeOf(grams){
-  return (+grams<=2000) ? "Small \u2013 fits in a shoebox (about 2 kg or less)"
-                        : "Medium \u2013 about the size of a backpack";
+function formCountryOf(code){
+  var c=R.country(code);
+  return (c&&c.form) ? c.form : FORM_OTHER;
 }
-var FORM_PACK = {
-  box: "Box (best protection)",
-  env: "Padded envelope (lighter, cheaper postage \u2013 for small, non-fragile items)"
+/* 大きさ：小形包装物になるとき＝Small、EMS になるとき＝Large。
+   「Several large boxes」「Not sure yet」は LP からは入れない。 */
+var FORM_SIZE = {
+  small: "Small \u2013 up to 2 kg and up to 90 cm (length + width + height)",
+  large: "Large \u2013 one box over 90 cm or over 2 kg"
 };
+/* いまの選択。送り方は rates.js の route() が決める
+   （梱包後 2kg 以下・90cm 以下＝小形包装物、それ以外＝EMS）。 */
+function pick(){
+  var c=R.country($("dest").value)||R.country("US");
+  var over90=($("over90").value==="1");
+  var q=R.route(c.zone, +$("wt").value, {}, { country:(c.other?null:c.code), over90:over90 });
+  /* どちらの送り方にも入らない重さ（1箱 30kg 超など）は、2kg も 90cm も超える側。 */
+  var small=!!(q&&q.service==="airPacket");
+  return { c:c, over90:over90, q:q, small:small };
+}
 /* 紹介コード（tracking.js が ?s= から omakase_ref に保存したもの）。無ければ ''。 */
 function refCode(){
   var re=/^[A-Z]{2}\d{2,3}$/;
@@ -293,10 +304,10 @@ function refCode(){
   return "";
 }
 function formUrl(){
+  var pk=pick();
   var q=[["usp","pp_url"],
-         [FORM.country, FORM_COUNTRY[$("dest").value] || FORM_OTHER],
-         [FORM.size, formSizeOf($("wt").value)],
-         [FORM.pack, FORM_PACK[$("packing").value] || FORM_PACK.box]];
+         [FORM.country, formCountryOf(pk.c.code)],
+         [FORM.size, pk.small ? FORM_SIZE.small : FORM_SIZE.large]];
   var rc=refCode();
   if(rc) q.push([FORM.ref, rc]);
   return FORM.url+"?"+q.map(function(x){
@@ -305,20 +316,15 @@ function formUrl(){
 
 var I18N = {
 en:{
- pack_over:"Over 5 kg — please message us for a quote.",
- pack_heavy:"Over 2 kg we always use a box — an envelope cannot protect a parcel this heavy.",
- q_pack:"How should we pack it?",
- pack_box:"Box — recommended for figures & anything fragile",
- pack_env:"Padded envelope — clothes, plush, books, flat items",
- pack_note:"A box protects better but adds about 200 g, which raises the postage. An envelope is lighter and cheaper, but is not suitable for boxed figures or fragile items. Any damage is covered under the carrier's compensation terms, and envelope shipments fall outside that coverage.",
- h1:"BUY BIG. Travel light.",
- lede:"We collect your Akihabara shopping, pack it, handle the customs paperwork and ship it home.",
- heroPriceLink:"Around ¥5,000–6,000 to the USA · See exact rates →",
+ pack_over:"One box can weigh up to {kg} kg packed, and this is over that. We split it into two or more boxes — book a drop-off or message us for a quote.",
+ h1:"Too big for your suitcase? Ship it home.",
+ lede:"Boxed figures, model kits, a whole shopping haul — drop it all off in Akihabara. We pack it into one sturdy box, handle the customs paperwork and ship it home.",
+ heroPriceLink:"See the price for your box →",
  trackRef:"Referred by ", trackCounter:"Show this at our counter",
  ship_h:"Two ways to send it home", ship_intl:"International shipping", ship_hotel:"Hotel delivery (within Japan)",
- ship_note:"Staying a few more nights? We can forward your haul to your next hotel in Japan, or ship it to your home country. Prices are starting points.",
+ ship_note:"Often less hassle than paying your airline for an extra checked bag — and nothing to drag to the airport. Small parcels are welcome too, and we can forward your shopping to your next hotel in Japan. Prices are starting points.",
  how_h:"How it works",
- s1t:"Book a drop-off", s1b:"Fill in a short form with your destination, size and packing. We email you to confirm where and when to drop off.",
+ s1t:"Book a drop-off", s1b:"Fill in a short form with your destination and the size of your haul. We email you to confirm where and when to drop off.",
  s2t:"Hand over your bags", s2b:"Meet us in Akihabara, or send them to us from your hotel. We check and repack everything properly.",
  s3t:"We do the paperwork", s3b:"Japan Post no longer accepts handwritten customs labels, and the online system is Japanese-only. We handle it, in your name, correctly.",
  s4t:"Choose your ship date", s4b:"Leave it with us and travel light. Tell us when to send — we post it and give you the tracking number.",
@@ -334,7 +340,7 @@ en:{
  book_note:"Opens a short Google Form with your choices filled in. We confirm the drop-off place and time by email.",
  q_ask:"Questions first? Ask us:",
  btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
- q_note:"Estimate only. Final price depends on actual weight and box size after repacking. Postage is charged at cost — we don't mark it up.",
+ q_note:"Estimate only. The service fee covers packing, the box, padding and the customs form. Final price depends on actual weight and box size after packing. Postage is charged at cost — we do not mark it up.",
  tax_h:"Please read first",
  tax_t:"Shipping means no tax refund on those items",
  tax_b:"From 1 November 2026 Japan refunds consumption tax only after customs confirms you are carrying the goods out at the airport. Anything you post home will not be with you at departure, so no refund on those items. Small or expensive things are usually worth carrying yourself; bulky, cheaper things are usually worth shipping. Ask us and we'll help you split it.",
@@ -342,23 +348,23 @@ en:{
  cant_b:"Postal and customs rules, not ours. If you are unsure, ask before you buy.",
  foot:"Operated by Ocean Trading Co., Ltd., a licensed second-hand dealer registered in Tokyo. Licensed second-hand dealer registered in Tokyo. Parcels are sent in your name as the sender. We are not a customs broker and do not provide tax advice.",
  partnerLink:"For businesses →",
+ q_size:"How big is the box?",
+ size_small:"Up to 90 cm (length + width + height)",
+ size_big:"Over 90 cm, or one side over 60 cm",
+ size_note_small:"Up to 2 kg packed and 90 cm in total goes as a small packet. Anything bigger or heavier goes by EMS.",
+ size_note_ems:"EMS size limit for this destination: longest side up to {len} m, length + girth up to {girth} m, up to {kg} kg per box. Bigger than that? We split it into more boxes.",
  no:["Lithium batteries (loose)","Power banks","Aerosols","Perfume / alcohol-based","Lighters","Food (varies by country)","Counterfeit goods","Anything sealed we cannot inspect"]
 },
 "zh-Hant":{
- pack_over:"超過5公斤請直接詢問報價。",
- pack_heavy:"超過2公斤一律使用紙箱。氣泡袋無法保護這麼重的包裹。",
- q_pack:"包裝方式",
- pack_box:"紙箱 — 建議公仔、盒裝品、易碎品使用",
- pack_env:"氣泡袋 — 衣物、絨毛玩偶、書籍、扁平物品",
- pack_note:"紙箱保護性較好，但會增加約200公克，運費也隨之提高。氣泡袋較輕較便宜，但不適合盒裝公仔或易碎品。破損時的補償依配送業者的規定辦理，氣泡袋寄送不在補償範圍內。",
- h1:"盡情選購大件，旅途依然輕鬆。",
- lede:"我們代收您在秋葉原購買的商品，包裝並處理報關文件後寄送到府。",
- heroPriceLink:"寄美國約¥5,000〜6,000 · 查看正確費率 →",
+ pack_over:"單箱包裝後上限為 {kg} 公斤，這個重量已超過。我們會分成兩箱以上寄送——請預約交件或來訊詢問報價。",
+ h1:"行李箱塞不下？直接寄回家。",
+ lede:"盒裝公仔、模型、整袋戰利品——全部在秋葉原交給我們。我們裝成一個堅固的紙箱，處理報關文件後寄到你家。",
+ heroPriceLink:"查看你的箱子要多少錢 →",
  trackRef:"介紹來源 ", trackCounter:"請在櫃檯出示此畫面",
  ship_h:"兩種寄回家的方式", ship_intl:"國際寄送", ship_hotel:"飯店配送（日本國內）",
- ship_note:"還要多住幾晚？我們可以把戰利品轉送到你在日本的下一間飯店，或寄回你的國家。顯示為起始價。",
+ ship_note:"比起向航空公司加購託運行李，通常更省事——也不用拖著大箱子去機場。小件包裹同樣歡迎，也可以轉送到你在日本的下一間飯店。顯示為起始價。",
  how_h:"服務流程",
- s1t:"預約交件", s1b:"填寫簡短表單（寄送國家、大小、包裝方式）。我們會以電子郵件確認交件地點與時間。",
+ s1t:"預約交件", s1b:"填寫簡短表單（寄送國家與物品大小）。我們會以電子郵件確認交件地點與時間。",
  s2t:"把東西交給我們", s2b:"在秋葉原面交，或從飯店寄給我們。我們會逐一確認並重新包裝。",
  s3t:"報關手續由我們處理", s3b:"日本郵局已不接受手寫報關單，線上系統只有日文。我們以你的名義正確填寫。",
  s4t:"自己決定寄出日", s4b:"東西放我們這裡，你輕鬆繼續玩。想寄的時候告訴我們，寄出後提供追蹤號碼。",
@@ -374,7 +380,7 @@ en:{
  book_note:"開啟已填入您選擇內容的 Google 表單。交件地點與時間會以電子郵件確認。",
  q_ask:"想先問問題？請聯絡我們：",
  btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
- q_note:"僅為預估。實際金額依重新包裝後的重量與箱子尺寸而定。郵資照實收，不加價。",
+ q_note:"僅為預估。服務費包含包裝、紙箱、緩衝材與報關單。實際金額依包裝後的重量與箱子尺寸而定。郵資照實收，不加價。",
  tax_h:"請務必先閱讀",
  tax_t:"寄回國的商品無法退稅",
  tax_b:"自2026年11月1日起，日本改為在機場由海關確認你確實帶著商品出境後才退還消費稅。寄回家的東西出境時不在你身上，因此那些商品無法退稅。體積小、單價高的建議自己帶；體積大、單價低的建議寄。可以問我們，我們幫你分。",
@@ -382,23 +388,23 @@ en:{
  cant_b:"這是郵政與海關的規定。不確定的話，購買前請先問我們。",
  foot:"由東京都公安委員會許可之古物商 有限会社オーシャン貿易 營運。東京都公安委員會許可之古物商。包裹以你本人為寄件人名義寄出。我們並非報關業者，也不提供稅務諮詢。",
  partnerLink:"商家合作洽詢 →",
+ q_size:"箱子多大？",
+ size_small:"長＋寬＋高 90 公分以內",
+ size_big:"超過 90 公分，或單邊超過 60 公分",
+ size_note_small:"包裝後 2 公斤以內且三邊合計 90 公分以內，以小包（small packet）寄送。更大或更重則以 EMS 寄送。",
+ size_note_ems:"此目的地的 EMS 尺寸上限：最長邊 {len} 公尺、長度＋周長 {girth} 公尺、每箱 {kg} 公斤。超過的話我們會分箱寄送。",
  no:["鋰電池（單獨）","行動電源","噴霧罐","香水／含酒精","打火機","食品（依國家而異）","仿冒品","無法開箱確認的密封物"]
 },
 "zh-Hans":{
- pack_over:"超过5公斤请直接询问报价。",
- pack_heavy:"超过2公斤一律使用纸箱。气泡袋无法保护这么重的包裹。",
- q_pack:"包装方式",
- pack_box:"纸箱 — 建议手办、盒装品、易碎品使用",
- pack_env:"气泡袋 — 衣物、毛绒玩具、书籍、扁平物品",
- pack_note:"纸箱保护性更好，但会增加约200克，运费也随之提高。气泡袋更轻更便宜，但不适合盒装手办或易碎品。破损时的补偿依配送业者的规定办理，气泡袋寄送不在补偿范围内。",
- h1:"尽情选购大件，旅途依然轻松。",
- lede:"我们代收您在秋叶原购买的商品，包装并处理报关文件后寄送到府。",
- heroPriceLink:"寄美国约¥5,000〜6,000 · 查看正确费率 →",
+ pack_over:"单箱包装后上限为 {kg} 公斤，这个重量已超过。我们会分成两箱以上寄送——请预约交件或来信询问报价。",
+ h1:"行李箱装不下？直接寄回家。",
+ lede:"盒装手办、模型、整袋战利品——全部在秋叶原交给我们。我们装成一个结实的纸箱，处理报关文件后寄到你家。",
+ heroPriceLink:"查看你的箱子要多少钱 →",
  trackRef:"介绍来源 ", trackCounter:"请在柜台出示此画面",
  ship_h:"两种寄回家的方式", ship_intl:"国际寄送", ship_hotel:"酒店配送（日本国内）",
- ship_note:"还要多住几晚？我们可以把战利品转送到你在日本的下一家酒店，或寄回你的国家。显示为起始价。",
+ ship_note:"比起向航空公司加购托运行李，通常更省事——也不用拖着大箱子去机场。小件包裹同样欢迎，也可以转送到你在日本的下一家酒店。显示为起始价。",
  how_h:"服务流程",
- s1t:"预约交件", s1b:"填写简短表单（寄送国家、大小、包装方式）。我们会通过电子邮件确认交件地点和时间。",
+ s1t:"预约交件", s1b:"填写简短表单（寄送国家与物品大小）。我们会通过电子邮件确认交件地点和时间。",
  s2t:"把东西交给我们", s2b:"在秋叶原面交，或从酒店寄给我们。我们会逐一确认并重新包装。",
  s3t:"报关手续由我们处理", s3b:"日本邮局已不接受手写报关单，线上系统只有日文。我们以你的名义正确填写。",
  s4t:"自己决定寄出日", s4b:"东西放我们这里，你可以轻装继续玩。想寄时告诉我们，寄出后提供追踪号。",
@@ -414,7 +420,7 @@ en:{
  book_note:"打开已填入您所选内容的 Google 表单。交件地点和时间会通过电子邮件确认。",
  q_ask:"想先咨询？请联系我们：",
  btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
- q_note:"仅为预估。实际金额依重新包装后的重量与箱子尺寸而定。邮资照实收，不加价。",
+ q_note:"仅为预估。服务费包含包装、纸箱、缓冲材料与报关单。实际金额依包装后的重量与箱子尺寸而定。邮资照实收，不加价。",
  tax_h:"请务必先阅读",
  tax_t:"寄回国的商品无法退税",
  tax_b:"自2026年11月1日起，日本改为在机场由海关确认你确实带着商品出境后才退还消费税。寄回家的东西出境时不在你身上，因此那些商品无法退税。体积小、单价高的建议自己带；体积大、单价低的建议寄。可以问我们，我们帮你分。",
@@ -422,23 +428,23 @@ en:{
  cant_b:"这是邮政与海关的规定。不确定的话，购买前请先问我们。",
  foot:"由东京都公安委员会许可之古物商 有限会社オーシャン貿易 运营。东京都公安委员会许可之古物商。包裹以你本人为寄件人名义寄出。我们并非报关业者，也不提供税务咨询。",
  partnerLink:"商家合作洽询 →",
+ q_size:"箱子多大？",
+ size_small:"长＋宽＋高 90 厘米以内",
+ size_big:"超过 90 厘米，或单边超过 60 厘米",
+ size_note_small:"包装后 2 公斤以内且三边合计 90 厘米以内，以小包（small packet）寄送。更大或更重则以 EMS 寄送。",
+ size_note_ems:"此目的地的 EMS 尺寸上限：最长边 {len} 米、长度＋周长 {girth} 米、每箱 {kg} 公斤。超过的话我们会分箱寄送。",
  no:["锂电池（单独）","充电宝","喷雾罐","香水／含酒精","打火机","食品（依国家而异）","仿冒品","无法开箱确认的密封物"]
 },
 ko:{
- pack_over:"5kg 초과는 문의해 주세요.",
- pack_heavy:"2kg을 넘으면 반드시 박스를 사용합니다. 봉투로는 이 무게를 보호할 수 없습니다.",
- q_pack:"포장 방법",
- pack_box:"박스 — 피규어·박스 상품·깨지기 쉬운 물건에 권장",
- pack_env:"안전봉투 — 의류, 인형, 책, 납작한 물건",
- pack_note:"박스는 보호력이 좋지만 약 200g이 늘어나 우편 요금이 올라갑니다. 봉투는 가볍고 저렴하지만 박스 피규어나 깨지기 쉬운 물건에는 적합하지 않습니다. 파손 시 보상은 배송업체의 규정에 따르며, 봉투 발송은 보상 대상이 아닙니다.",
- h1:"크게 사세요. 짐은 가볍게.",
- lede:"아키하바라에서 구매하신 물건을 맡아 포장하고 통관 서류까지 처리하여 집으로 보내드립니다.",
- heroPriceLink:"미국까지 약 ¥5,000〜6,000 · 정확한 요금 보기 →",
+ pack_over:"한 박스는 포장 후 {kg}kg까지이며, 이 무게는 그보다 큽니다. 두 박스 이상으로 나누어 보내 드립니다. 맡기기 예약을 하시거나 견적을 문의해 주세요.",
+ h1:"캐리어에 안 들어가나요? 집으로 보내세요.",
+ lede:"박스 피규어, 프라모델, 쇼핑한 물건 전부 — 아키하바라에서 맡겨 주세요. 튼튼한 박스 하나로 포장하고 통관 서류까지 처리해 집으로 보내드립니다.",
+ heroPriceLink:"내 박스 요금 보기 →",
  trackRef:"추천인 ", trackCounter:"카운터에서 이 화면을 보여주세요",
  ship_h:"집으로 보내는 두 가지 방법", ship_intl:"해외 배송", ship_hotel:"호텔 배송(일본 국내)",
- ship_note:"며칠 더 머무시나요? 다음 호텔로 전달하거나 본국으로 발송해 드립니다. 표시는 시작 가격입니다.",
+ ship_note:"항공사에 추가 위탁 수하물 요금을 내는 것보다 대개 간편하고, 큰 짐을 공항까지 끌고 갈 필요도 없습니다. 작은 소포도 받으며, 일본 내 다음 호텔로 보내 드릴 수도 있습니다. 표시는 시작 가격입니다.",
  how_h:"이용 방법",
- s1t:"맡기기 예약", s1b:"배송 국가·크기·포장 방법을 짧은 양식에 입력해 주세요. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
+ s1t:"맡기기 예약", s1b:"배송 국가와 짐의 크기를 짧은 양식에 입력해 주세요. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
  s2t:"짐을 맡겨주세요", s2b:"아키하바라에서 직접 전달하거나 호텔에서 보내주세요. 하나하나 확인 후 다시 포장합니다.",
  s3t:"통관 서류는 저희가", s3b:"일본우편은 손으로 쓴 통관 라벨을 더 이상 받지 않으며, 온라인 시스템은 일본어뿐입니다. 고객님 명의로 정확히 작성합니다.",
  s4t:"발송일은 직접 결정", s4b:"맡겨두고 가볍게 여행하세요. 보낼 때 알려주시면 발송 후 운송장 번호를 드립니다.",
@@ -454,7 +460,7 @@ ko:{
  book_note:"선택하신 내용이 입력된 Google 양식이 열립니다. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
  q_ask:"먼저 궁금한 점이 있으신가요? 문의하기:",
  btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"이메일",
- q_note:"예상 금액입니다. 재포장 후 실제 무게와 박스 크기에 따라 확정됩니다. 우편 요금은 실비로만 청구합니다.",
+ q_note:"예상 금액입니다. 서비스 요금에는 포장, 박스, 완충재, 통관 서류가 포함됩니다. 포장 후 실제 무게와 박스 크기에 따라 확정됩니다. 우편 요금은 실비로만 청구합니다.",
  tax_h:"먼저 확인해 주세요",
  tax_t:"발송한 물건은 면세 환급을 받을 수 없습니다",
  tax_b:"2026년 11월 1일부터 일본은 공항에서 세관이 물품 반출을 확인한 후에만 소비세를 환급합니다. 미리 부친 물건은 출국 시 손에 없으므로 환급 대상이 아닙니다. 작고 비싼 것은 직접 들고, 부피가 크고 저렴한 것은 부치는 편이 유리합니다. 물어보시면 나눠 드립니다.",
@@ -462,23 +468,23 @@ ko:{
  cant_b:"우편·세관 규정입니다. 확실하지 않으면 구매 전에 문의해 주세요.",
  foot:"도쿄도 공안위원회 허가 고물상 有限会社オーシャン貿易 가 운영합니다. 도쿄도 공안위원회 허가 고물상. 소포는 고객님 명의의 발송인으로 보내집니다. 관세사가 아니며 세무 상담은 제공하지 않습니다.",
  partnerLink:"제휴 매장 모집 →",
+ q_size:"박스 크기는?",
+ size_small:"가로＋세로＋높이 90cm 이하",
+ size_big:"90cm 초과, 또는 한 변이 60cm 초과",
+ size_note_small:"포장 후 2kg 이하이고 세 변의 합이 90cm 이하이면 소형포장물(small packet)로 보냅니다. 그보다 크거나 무거우면 EMS로 보냅니다.",
+ size_note_ems:"이 목적지의 EMS 크기 제한: 가장 긴 변 {len}m, 길이＋둘레 {girth}m, 박스당 {kg}kg까지. 더 크면 여러 박스로 나누어 보냅니다.",
  no:["리튬 배터리(단독)","보조배터리","스프레이","향수/알코올 함유","라이터","식품(국가별 상이)","위조품","개봉 확인 불가한 밀봉품"]
 },
 ja:{
- pack_over:"5kg超はお問い合わせください。",
- pack_heavy:"2kgを超える荷物は段ボール固定です。封筒ではこの重さを保護できません。",
- q_pack:"梱包方法",
- pack_box:"段ボール箱 — フィギュア・箱物・壊れやすいものに推奨",
- pack_env:"クッション封筒 — 衣類・ぬいぐるみ・書籍・薄いもの",
- pack_note:"段ボールは保護力が高い一方、約200g重くなり送料が上がります。封筒は軽く安価ですが、箱入りフィギュアや壊れやすいものには向きません。破損時の補償は配送事業者の規定に従い、封筒での発送は補償の対象外となります。",
- h1:"荷物は預けて、手ぶらで旅を楽しんで。",
- lede:"秋葉原で買った荷物は、ご自宅までお送りします。米国まで¥4,410から。",
- heroPriceLink:"米国まで約¥5,000〜6,000 · 正確な料金を見る →",
+ pack_over:"1箱は梱包後 {kg}kg までで、この重さはそれを超えます。2箱以上に分けてお送りしますので、予約またはお問い合わせでご相談ください。",
+ h1:"スーツケースに入らない荷物は、まとめて送る。",
+ lede:"箱入りフィギュア、プラモデル、買い込んだ荷物をまるごと。秋葉原で預けていただければ、丈夫な箱ひとつにまとめ、通関書類を作ってご自宅までお送りします。",
+ heroPriceLink:"箱の大きさで料金を見る →",
  trackRef:"紹介元 ", trackCounter:"受付でこの画面をご提示ください",
  ship_h:"2つの送り方", ship_intl:"海外発送", ship_hotel:"ホテル配送（日本国内）",
- ship_note:"まだ滞在が続きますか？次のホテルへお届けするか、ご自宅の国へ発送します。表示は最低料金です。",
+ ship_note:"航空会社に追加の預け荷物の料金を払うより手間がかからないことが多く、大きな荷物を空港まで運ぶ必要もありません。小さな荷物もお受けしますし、日本国内の次のホテルへお届けすることもできます。表示は最低料金です。",
  how_h:"ご利用の流れ",
- s1t:"預け入れを予約", s1b:"送り先の国・大きさ・梱包の方法を短いフォームに入れてください。預け入れの場所と時間は、予約確認メールでお知らせします。",
+ s1t:"預け入れを予約", s1b:"送り先の国と荷物の大きさを短いフォームに入れてください。預け入れの場所と時間は、予約確認メールでお知らせします。",
  s2t:"荷物をお預けください", s2b:"秋葉原で直接お渡しいただくか、ホテルからお送りください。中身を確認して梱包し直します。",
  s3t:"通関書類は当方で作成", s3b:"日本郵便は手書きラベルを受け付けておらず、オンラインシステムは日本語のみです。お客様名義で正確に作成します。",
  s4t:"発送日はお客様が決定", s4b:"預けたまま身軽に観光できます。発送のご連絡をいただき次第、追跡番号をお伝えします。",
@@ -494,7 +500,7 @@ ja:{
  book_note:"選んだ内容が入った Google フォームが開きます。預け入れの場所と時間は、予約確認メールでお知らせします。",
  q_ask:"先に質問したい方はこちら：",
  btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"メール",
- q_note:"概算です。梱包後の実重量と箱のサイズで確定します。郵送料は実費のみで、上乗せはしません。",
+ q_note:"概算です。Service fee には梱包・箱・緩衝材・通関書類の作成を含みます。梱包後の実重量と箱のサイズで確定します。郵送料は実費のみで、上乗せはしません。",
  tax_h:"必ずお読みください",
  tax_t:"発送した商品は免税の対象外になります",
  tax_b:"2026年11月1日以降、日本の消費税還付は、空港で税関が持ち出しを確認した後に行われます。先に発送した商品は出国時に手元にないため、還付を受けられません。小さく高価なものはお手荷物で、かさばって安価なものは発送、という分け方が有利です。ご相談いただければ仕分けをお手伝いします。",
@@ -502,6 +508,11 @@ ja:{
  cant_b:"郵便・税関の規定によるものです。ご不明な場合は購入前にご相談ください。",
  foot:"運営：有限会社オーシャン貿易（東京都公安委員会許可 古物商）。荷物はお客様ご本人を差出人として発送します。通関業者ではなく、税務に関する助言は行いません。",
  partnerLink:"提携をご検討の店舗様へ →",
+ q_size:"箱の大きさ",
+ size_small:"縦＋横＋高さが 90cm 以下",
+ size_big:"90cm を超える、またはいちばん長い辺が 60cm を超える",
+ size_note_small:"梱包後 2kg 以下で、3辺の合計が 90cm 以下なら小形包装物でお送りします。それより大きい・重い荷物は EMS でお送りします。",
+ size_note_ems:"この送り先の EMS の大きさの上限：いちばん長い辺 {len}m、長さ＋胴回り {girth}m、1箱 {kg}kg まで。これを超える場合は箱を分けてお送りします。",
  no:["リチウム電池（単体）","モバイルバッテリー","スプレー類","香水・アルコール含有","ライター","食品（国により異なる）","模倣品","開封確認できない密封物"]
 }
 };
@@ -524,7 +535,7 @@ function applyLang(L){
   $("noList").innerHTML = t.no.map(function(x){return "<span>"+x+"</span>";}).join("");
   $("bizName").textContent = CONFIG.bizName;
   // 2つの送り方の「〜」表記（海外は米国0.5kgの最低額、国内はHOTEL_BASE）
-  var fromIntl = R.handling + R.packing.box.cost + R.bestQuote(4,500).postage;
+  var fromIntl = R.handling + R.route(4,500,{},{country:"US"}).postage;
   $("priceIntl").textContent  = "¥"+fromIntl.toLocaleString()+"〜";
   $("priceHotel").textContent = "¥"+R.HOTEL_BASE.toLocaleString()+"〜";
   document.querySelectorAll("#langs button").forEach(function(b){
@@ -537,56 +548,40 @@ document.querySelectorAll("#langs button").forEach(function(b){
   b.onclick=function(){ applyLang(b.getAttribute("data-lang")); window.scrollTo(0,0); };
 });
 
+function fill(tpl,o){
+  return String(tpl||"").replace(/\{(\w+)\}/g,function(m,k){ return (o[k]!==undefined)?o[k]:m; });
+}
 function calc(){
-  var zone=+$("dest").value, wtSel=+$("wt").value, days=+$("days").value;
-
-  // 梱包後重量（1.3倍 と +200g の大きい方）で送料を判定
+  var t=I18N[lang]||I18N.en;
+  var pk=pick(), q=pk.q, days=+$("days").value;
+  var wtSel=+$("wt").value;
+  // 梱包後の重さ（1.3倍 と +200g の大きいほう）で送り方と送料を決める
   var packed = R.packedWeight(wtSel);
-
-  // 封筒は梱包後2kgまで → 超えたら箱に固定する
-  var envOpt = document.querySelector('[data-i18n-opt="pack_env"]');
-  var envTooHeavy = packed > R.packing.env.maxGrams;
-  envOpt.disabled = envTooHeavy;
-  if(envTooHeavy && $("packing").value === "env") $("packing").value = "box";
-
-  var pk = R.packing[$("packing").value];
-
-  var q = R.bestQuote(zone, wtSel);   // 利用可能な最安サービス（送料のみ）
+  var lim = R.emsLimit(pk.c.other?null:pk.c.code);
+  var limTxt = { len:(lim.len/100), girth:(lim.girth/100), kg:lim.maxKg };
   var storage = Math.max(0, days-R.freeDays)*R.perDay;
+
+  /* 大きさの注記：小形包装物になるときはその条件、EMS になるときは EMS の上限。 */
+  $("sizeNote").textContent = pk.small ? (t.size_note_small||I18N.en.size_note_small)
+                                       : fill(t.size_note_ems||I18N.en.size_note_ems, limTxt);
   if(!q){
     $("estVal").textContent="—";
-    $("estSub").textContent = (I18N[lang].pack_over || I18N.en.pack_over);
-    $("btnBook").href = $("btnBookHero").href = formUrl();
+    $("estSub").textContent = fill(t.pack_over || I18N.en.pack_over, limTxt);
+    buildLinks(null, null, packed);
     return;
   }
 
-  var total = R.handling + pk.cost + storage + q.postage;
+  var total = R.handling + storage + q.postage;
   $("estVal").textContent = "¥"+total.toLocaleString();
 
-  /* Shopify の商品・予約フォームと同じ書き方（取扱手数料＋梱包の合計。計算は変えない）。 */
+  /* Shopify の商品・予約フォームと同じ書き方（Service fee に梱包・箱を含む）。 */
   var parts = [
-    "Service fee ¥"+(R.handling+pk.cost).toLocaleString()
-      +($("packing").value==="env" ? " (packing, padded envelope, customs form)"
-                                   : " (packing, box, padding, customs form)"),
+    "Service fee ¥"+R.handling.toLocaleString()+" (packing, box, padding, customs form)",
     q.label+" ¥"+q.postage.toLocaleString()+" ("+packed+"g)",
     storage>0 ? "Storage ¥"+storage.toLocaleString()+" ("+(days-R.freeDays)+"d)"
               : "Storage free ("+R.freeDays+"d incl.)"
   ];
   $("estSub").textContent = parts.join("  ·  ");
-  $("packNote").textContent = envTooHeavy
-    ? (I18N[lang].pack_heavy || I18N.en.pack_heavy)
-    : I18N[lang].pack_note;
-
-  // もう一方の梱包との費用差（封筒が使える重量のときだけ。送料は同じ＝費用差のみ）
-  if(!envTooHeavy){
-    var otherKey = $("packing").value==="box" ? "env" : "box";
-    var d = pk.cost - R.packing[otherKey].cost;
-    if(d !== 0){
-      $("estSub").textContent += "  ·  " +
-        (otherKey==="env" ? "Envelope" : "Box") + " " +
-        (d>0 ? "−¥"+Math.abs(d).toLocaleString() : "+¥"+Math.abs(d).toLocaleString());
-    }
-  }
   buildLinks(total, q, packed);
 }
 
@@ -594,14 +589,15 @@ function calc(){
 function buildLinks(total, q, packed){
   var destTxt=$("dest").options[$("dest").selectedIndex].text;
   var wtTxt=$("wt").options[$("wt").selectedIndex].text;
-  var packTxt=$("packing").value==="box" ? "Box" : "Padded envelope";
+  var sizeTxt=($("over90").value==="1") ? "over 90 cm (L+W+H)" : "up to 90 cm (L+W+H)";
   var days=$("days").value;
   var msg = "Hello! I'd like a quote.\n"
           + "Destination: "+destTxt+"\n"
           + "Weight: "+wtTxt+"\n"
-          + "Packing: "+packTxt+"\n"
+          + "Box size: "+sizeTxt+"\n"
           + "Hold for: "+days+" days\n"
-          + "Estimate shown: ¥"+total.toLocaleString()+" ("+q.label+", billed at "+packed+"g)";
+          + (q ? "Estimate shown: ¥"+total.toLocaleString()+" ("+q.label+", billed at "+packed+"g)"
+               : "Estimate shown: none (over the limit for one box, about "+packed+"g packed)");
   /* 紹介コード（?s= で保存したもの）も本文に入れる。 */
   var rc=refCode();
   if(rc) msg += "\nReferral code: "+rc;
@@ -614,7 +610,14 @@ function buildLinks(total, q, packed){
   $("btnMail").href= "mailto:"+CONFIG.email+"?subject="+encodeURIComponent("Shipping quote request")+"&body="+enc;
 }
 
-["dest","wt","days","packing"].forEach(function(id){ $(id).addEventListener("change", calc); });
+/* 送り先の選択肢（国ごと）。送料は地帯ごとのまま（rates.js の COUNTRIES の zone）。 */
+(function(){
+  $("dest").innerHTML = R.COUNTRIES.map(function(c){
+    return '<option value="'+c.code+'"'+(c.code==="US"?" selected":"")+'>'+c.nameEn+'</option>';
+  }).join("");
+})();
+
+["dest","wt","days","over90"].forEach(function(id){ $(id).addEventListener("change", calc); });
 
 /* 端末の言語で初期表示を切り替え */
 (function(){
