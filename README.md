@@ -28,9 +28,7 @@
 ```js
 var CONFIG = {
   bizName:  "Omakase Ship by Play Japan",
-  whatsapp: "819000000000",   // ← 国番号81 + 先頭0を除いた番号
-  lineId:   "your-line-id",   // ← LINE公式アカウントID(@は除く)
-  email:    "hello@example.com"
+  email:    "gamegamesan@gmail.com"   // 質問の窓口はメールだけ
 };
 ```
 
@@ -39,7 +37,7 @@ var CONFIG = {
 ## 予約フォーム（入口）
 
 いちばん目立つボタンは「**予約する（Book a drop-off）**」で、Google フォームを開きます
-（`index.html` の `FORM`）。WhatsApp・LINE・メールは「質問はこちら」として小さく残しています。
+（`index.html` の `FORM`）。質問の窓口は**メールだけ**です（2026-11-25〜。WhatsApp・LINE はやめました）。アドレスを文字でも表示し、コピーボタンを付けています（メールアプリが無いスマホ向け）。
 
 料金の目安で選んだ内容と紹介コードを、`usp=pp_url` の事前入力で入れて開きます。
 選択肢の文字は**フォームと完全一致**にしてあります（`–` は en ダッシュ U+2013）。
@@ -52,7 +50,7 @@ var CONFIG = {
 | 紹介コード | `entry.2128966062` | `?s=` で保存した紹介元のコード（`omakase_ref`）。無ければ入れない |
 
 梱包の質問（`entry.1194186612`）はフォームから消したので、LP からも入れません。
-紹介コードは WhatsApp・メールの本文にも「Referral code: ◯◯」で入ります。
+紹介コードはメールの本文にも「Referral code: ◯◯」で入ります。
 住所・部屋番号は LP に書きません（受付場所は予約確認メールで伝えます）。
 
 ## 送り方は2つだけ（2026-11-23〜）

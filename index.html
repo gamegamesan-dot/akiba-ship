@@ -90,6 +90,8 @@ select:focus,input:focus{outline:2px solid var(--navy);outline-offset:-1px;backg
 .herobook{display:block;margin-top:16px;max-width:420px}
 .ask{margin-top:14px;font-size:13px;color:var(--ink2)}
 .ask a{display:inline-block;margin:6px 10px 0 0;font-weight:700;color:var(--navy)}
+.ask .mailAddr{display:inline-block;margin:6px 8px 0 0;font-family:ui-monospace,Menlo,Consolas,monospace;user-select:all;word-break:break-all}
+.ask .copyBtn{margin-top:6px;padding:3px 10px;font:inherit;font-size:12px;font-weight:700;color:var(--navy);background:none;border:1px solid currentColor;border-radius:4px;cursor:pointer}
 
 footer{margin-top:34px;background:var(--ink);color:#8d939c;padding:22px 0 calc(26px + env(safe-area-inset-bottom));font-size:12.5px;line-height:1.7}
 footer b{color:#e7e3da}
@@ -210,9 +212,9 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
       <a class="btn book" id="btnBook" href="#" target="_blank" rel="noopener" data-i18n="btn_book"></a>
       <p class="small" style="margin:8px 0 0" data-i18n="book_note"></p>
       <div class="ask"><span data-i18n="q_ask"></span><br>
-        <a id="btnWa" href="#" data-i18n="btn_wa"></a>
-        <a id="btnLine" href="#" data-i18n="btn_line"></a>
         <a id="btnMail" href="#" data-i18n="btn_mail"></a>
+        <span class="mailAddr" id="mailAddr"></span>
+        <button type="button" class="copyBtn" id="btnCopy" data-i18n="btn_copy"></button>
       </div>
       <p class="small" style="margin-top:12px" data-i18n="q_note"></p>
     </div>
@@ -252,9 +254,7 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
 var R = window.AKIBA_RATES;   // 共通料金モジュール
 var CONFIG = {
   bizName:  "Omakase Ship by Play Japan",
-  whatsapp: "819000000000",              // 国番号81 + 先頭0を除いた番号
-  lineId:   "your-line-id",              // LINE公式アカウントID（@は除く）
-  email:    "hello@example.com"
+  email:    "gamegamesan@gmail.com"       // 質問の窓口はメールだけ（2026-11-25〜）
 };
 
 /* 予約フォーム（Google フォーム）。料金の目安で選んだ内容と紹介コードを入れて開く
@@ -341,8 +341,8 @@ en:{
  q_est:"ESTIMATED TOTAL",
  btn_book:"Book a drop-off",
  book_note:"Opens a short Google Form with your choices filled in. We confirm the drop-off place and time by email.",
- q_ask:"Questions first? Ask us:",
- btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
+ q_ask:"Questions first? Email us (we usually reply within a day):",
+ btn_mail:"Email", btn_copy:"Copy address", copied:"Copied!",
  q_note:"Estimate only. The service fee covers packing, the box, padding and the customs form. Final price depends on actual weight and box size after packing. Postage is charged at cost — we do not mark it up.",
  tax_h:"Please read first",
  tax_t:"Shipping means no tax refund on those items",
@@ -382,8 +382,8 @@ en:{
  q_est:"預估總金額",
  btn_book:"預約交件（Book a drop-off）",
  book_note:"開啟已填入您選擇內容的 Google 表單。交件地點與時間會以電子郵件確認。",
- q_ask:"想先問問題？請聯絡我們：",
- btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
+ q_ask:"想先問問題？請寄電子郵件給我們（通常一天內回覆）：",
+ btn_mail:"Email", btn_copy:"複製地址", copied:"已複製！",
  q_note:"僅為預估。服務費包含包裝、紙箱、緩衝材與報關單。實際金額依包裝後的重量與箱子尺寸而定。郵資照實收，不加價。",
  tax_h:"請務必先閱讀",
  tax_t:"寄回國的商品無法退稅",
@@ -423,8 +423,8 @@ en:{
  q_est:"预估总金额",
  btn_book:"预约交件（Book a drop-off）",
  book_note:"打开已填入您所选内容的 Google 表单。交件地点和时间会通过电子邮件确认。",
- q_ask:"想先咨询？请联系我们：",
- btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"Email",
+ q_ask:"想先咨询？请发送电子邮件（通常一天内回复）：",
+ btn_mail:"Email", btn_copy:"复制地址", copied:"已复制！",
  q_note:"仅为预估。服务费包含包装、纸箱、缓冲材料与报关单。实际金额依包装后的重量与箱子尺寸而定。邮资照实收，不加价。",
  tax_h:"请务必先阅读",
  tax_t:"寄回国的商品无法退税",
@@ -464,8 +464,8 @@ ko:{
  q_est:"예상 합계",
  btn_book:"맡기기 예약하기 (Book a drop-off)",
  book_note:"선택하신 내용이 입력된 Google 양식이 열립니다. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
- q_ask:"먼저 궁금한 점이 있으신가요? 문의하기:",
- btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"이메일",
+ q_ask:"먼저 궁금한 점이 있으신가요? 이메일로 문의해 주세요(보통 하루 안에 답장드립니다):",
+ btn_mail:"이메일", btn_copy:"주소 복사", copied:"복사했습니다!",
  q_note:"예상 금액입니다. 서비스 요금에는 포장, 박스, 완충재, 통관 서류가 포함됩니다. 포장 후 실제 무게와 박스 크기에 따라 확정됩니다. 우편 요금은 실비로만 청구합니다.",
  tax_h:"먼저 확인해 주세요",
  tax_t:"발송한 물건은 면세 환급을 받을 수 없습니다",
@@ -505,8 +505,8 @@ ja:{
  q_est:"概算合計",
  btn_book:"預け入れを予約する（Book a drop-off）",
  book_note:"選んだ内容が入った Google フォームが開きます。預け入れの場所と時間は、予約確認メールでお知らせします。",
- q_ask:"先に質問したい方はこちら：",
- btn_wa:"WhatsApp", btn_line:"LINE", btn_mail:"メール",
+ q_ask:"先に質問したい方はメールでどうぞ（ふつう1日以内にお返事します）：",
+ btn_mail:"メール", btn_copy:"アドレスをコピー", copied:"コピーしました",
  q_note:"概算です。Service fee には梱包・箱・緩衝材・通関書類の作成を含みます。梱包後の実重量と箱のサイズで確定します。郵送料は実費のみで、上乗せはしません。",
  tax_h:"必ずお読みください",
  tax_t:"発送した商品は免税の対象外になります",
@@ -525,6 +525,15 @@ ja:{
 };
 
 var $=function(id){return document.getElementById(id);};
+/* 質問用メール：アドレスを文字でも出し、コピーできるようにする（メールアプリが無いスマホ向け） */
+(function(){
+  $("mailAddr").textContent = CONFIG.email;
+  $("btnCopy").addEventListener("click", function(){
+    var b=this, done=function(){ var t=I18N[lang]||I18N.en; b.textContent=t.copied; setTimeout(function(){ b.textContent=t.btn_copy; },1800); };
+    try { navigator.clipboard.writeText(CONFIG.email).then(done, function(){ window.prompt("Email", CONFIG.email); }); }
+    catch(e){ window.prompt("Email", CONFIG.email); }
+  });
+})();
 var lang="en";
 
 function applyLang(L){
@@ -627,8 +636,6 @@ function buildLinks(total, q, packed){
   var fu=formUrl();
   $("btnBook").href = fu;
   $("btnBookHero").href = fu;
-  $("btnWa").href  = "https://wa.me/"+CONFIG.whatsapp+"?text="+enc;
-  $("btnLine").href= "https://line.me/R/ti/p/@"+CONFIG.lineId;
   $("btnMail").href= "mailto:"+CONFIG.email+"?subject="+encodeURIComponent("Shipping quote request")+"&body="+enc;
 }
 
