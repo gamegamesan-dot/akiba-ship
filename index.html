@@ -96,6 +96,14 @@ select:focus,input:focus{outline:2px solid var(--navy);outline-offset:-1px;backg
 footer{margin-top:34px;background:var(--ink);color:#8d939c;padding:22px 0 calc(26px + env(safe-area-inset-bottom));font-size:12.5px;line-height:1.7}
 footer b{color:#e7e3da}
 footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:2px}
+
+/* 受付の大まかな場所（正確な住所は予約確定メールで） */
+:root{--mapbg:#efece4;--maproad:#fff;--maprail:#8d939c}
+.where .wlead{margin:0 0 10px;font-size:14.5px;font-weight:700;color:var(--ink)}
+.wmap{display:block;width:100%;max-width:420px;height:auto;margin:0 auto 6px}
+.wmap .mt{font:600 11px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:var(--ink)}
+.wmap .sm{font-size:9.5px}.wmap .b{font-weight:800}.wmap .red{fill:var(--red)}.wmap .mute{fill:var(--mute)}
+.wst td{padding:7px 0}
 [data-i18n]{}
 </style>
 </head>
@@ -151,6 +159,36 @@ footer a.footlink{color:#aeb4bd;text-decoration:underline;text-underline-offset:
         <h3 data-i18n="s3t"></h3><p data-i18n="s3b"></p></div></div>
       <div class="step"><div class="stepno">4</div><div>
         <h3 data-i18n="s4t"></h3><p data-i18n="s4b"></p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="where_h"></h2>
+    <div class="card where">
+      <p class="wlead" data-i18n="where_lead"></p>
+      <svg class="wmap" viewBox="0 0 320 210" role="img" aria-label="Map">
+        <rect x="0" y="0" width="320" height="210" rx="4" fill="var(--mapbg)"/>
+        <line x1="92" y1="0" x2="92" y2="210" stroke="var(--maproad)" stroke-width="7"/>
+        <text x="98" y="204" class="mt sm">Chuo-dori</text>
+        <line x1="250" y1="0" x2="250" y2="210" stroke="var(--maprail)" stroke-width="4" stroke-dasharray="10 5"/>
+        <text x="256" y="104" class="mt sm">JR</text>
+        <circle cx="152" cy="86" r="44" fill="rgba(200,16,46,.16)" stroke="var(--red)" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="152" y="90" text-anchor="middle" class="mt b red sm">Omakase Ship</text>
+        <circle cx="92" cy="120" r="6" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <text x="80" y="124" text-anchor="end" class="mt">Suehirocho</text>
+        <circle cx="250" cy="40" r="6" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <text x="240" y="44" text-anchor="end" class="mt">Okachimachi</text>
+        <circle cx="250" cy="180" r="6" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <text x="240" y="184" text-anchor="end" class="mt">Akihabara</text>
+        <text x="170" y="160" text-anchor="middle" class="mt sm mute">Electric Town ↓</text>
+      </svg>
+      <table class="wst">
+        <tr><td data-i18n="where_st1"></td><td class="r" data-i18n="where_m1"></td></tr>
+        <tr><td data-i18n="where_st2"></td><td class="r" data-i18n="where_m2"></td></tr>
+        <tr><td data-i18n="where_st3"></td><td class="r" data-i18n="where_m3"></td></tr>
+        <tr><td data-i18n="where_st4"></td><td class="r" data-i18n="where_m4"></td></tr>
+      </table>
+      <p class="small" style="margin:10px 0 0" data-i18n="where_note"></p>
     </div>
   </section>
 
@@ -326,6 +364,7 @@ en:{
  ship_h:"Two ways to send it home", ship_intl:"International shipping", ship_hotel:"Hotel delivery (within Japan)",
  ship_note:"Often less hassle than paying your airline for an extra checked bag — and nothing to drag to the airport. Small parcels are welcome too, and we can forward your shopping to your next hotel in Japan. Prices are starting points.",
  how_h:"How it works",
+ where_h:"Where to drop off", where_lead:"Between Akihabara and Okachimachi — a few minutes' walk north of Electric Town.", where_st1:"Suehirocho Station (Ginza Line)", where_m1:"4 min walk", where_st2:"Naka-Okachimachi Station (Hibiya Line)", where_m2:"6 min walk", where_st3:"Okachimachi Station (JR)", where_m3:"7 min walk", where_st4:"Akihabara Station (JR)", where_m4:"8 min walk", where_note:"Our drop-off point is a private residence, so we send the exact address (building and room) by email once your booking is confirmed — just like Airbnb. The map shows the approximate area only.",
  s1t:"Book a drop-off", s1b:"Fill in a short form with your destination and the size of your haul. We email you to confirm where and when to drop off.",
  s2t:"Hand over your bags", s2b:"Meet us in Akihabara, or send them to us from your hotel. We check and repack everything properly.",
  s3t:"We do the paperwork", s3b:"Japan Post no longer accepts handwritten customs labels, and the online system is Japanese-only. We handle it, in your name, correctly.",
@@ -367,6 +406,7 @@ en:{
  ship_h:"兩種寄回家的方式", ship_intl:"國際寄送", ship_hotel:"飯店配送（日本國內）",
  ship_note:"比起向航空公司加購託運行李，通常更省事——也不用拖著大箱子去機場。小件包裹同樣歡迎，也可以轉送到你在日本的下一間飯店。顯示為起始價。",
  how_h:"服務流程",
+ where_h:"交件地點", where_lead:"位於秋葉原與御徒町之間，從電器街往北步行幾分鐘即可到達。", where_st1:"末廣町站（銀座線）", where_m1:"步行 4 分鐘", where_st2:"仲御徒町站（日比谷線）", where_m2:"步行 6 分鐘", where_st3:"御徒町站（JR）", where_m3:"步行 7 分鐘", where_st4:"秋葉原站（JR）", where_m4:"步行 8 分鐘", where_note:"交件地點為私人住宅，因此預約確認後才會以電子郵件告知詳細地址（大樓名稱與房號），與 Airbnb 相同。地圖僅顯示大致範圍。",
  s1t:"預約交件", s1b:"填寫簡短表單（寄送國家與物品大小）。我們會以電子郵件確認交件地點與時間。",
  s2t:"把東西交給我們", s2b:"在秋葉原面交，或從飯店寄給我們。我們會逐一確認並重新包裝。",
  s3t:"報關手續由我們處理", s3b:"日本郵局已不接受手寫報關單，線上系統只有日文。我們以你的名義正確填寫。",
@@ -408,6 +448,7 @@ en:{
  ship_h:"两种寄回家的方式", ship_intl:"国际寄送", ship_hotel:"酒店配送（日本国内）",
  ship_note:"比起向航空公司加购托运行李，通常更省事——也不用拖着大箱子去机场。小件包裹同样欢迎，也可以转送到你在日本的下一家酒店。显示为起始价。",
  how_h:"服务流程",
+ where_h:"交件地点", where_lead:"位于秋叶原与御徒町之间，从电器街往北步行几分钟即可到达。", where_st1:"末广町站（银座线）", where_m1:"步行 4 分钟", where_st2:"仲御徒町站（日比谷线）", where_m2:"步行 6 分钟", where_st3:"御徒町站（JR）", where_m3:"步行 7 分钟", where_st4:"秋叶原站（JR）", where_m4:"步行 8 分钟", where_note:"交件地点为私人住宅，因此预约确认后才会通过电子邮件告知详细地址（楼名和房号），与 Airbnb 相同。地图仅显示大致范围。",
  s1t:"预约交件", s1b:"填写简短表单（寄送国家与物品大小）。我们会通过电子邮件确认交件地点和时间。",
  s2t:"把东西交给我们", s2b:"在秋叶原面交，或从酒店寄给我们。我们会逐一确认并重新包装。",
  s3t:"报关手续由我们处理", s3b:"日本邮局已不接受手写报关单，线上系统只有日文。我们以你的名义正确填写。",
@@ -449,6 +490,7 @@ ko:{
  ship_h:"집으로 보내는 두 가지 방법", ship_intl:"해외 배송", ship_hotel:"호텔 배송(일본 국내)",
  ship_note:"항공사에 추가 위탁 수하물 요금을 내는 것보다 대개 간편하고, 큰 짐을 공항까지 끌고 갈 필요도 없습니다. 작은 소포도 받으며, 일본 내 다음 호텔로 보내 드릴 수도 있습니다. 표시는 시작 가격입니다.",
  how_h:"이용 방법",
+ where_h:"맡기는 장소", where_lead:"아키하바라와 오카치마치 사이, 전자상가에서 북쪽으로 걸어서 몇 분 거리입니다.", where_st1:"스에히로초역 (긴자선)", where_m1:"도보 4분", where_st2:"나카오카치마치역 (히비야선)", where_m2:"도보 6분", where_st3:"오카치마치역 (JR)", where_m3:"도보 7분", where_st4:"아키하바라역 (JR)", where_m4:"도보 8분", where_note:"맡기는 장소가 개인 주택이라서, 정확한 주소(건물명·호실)는 예약이 확정된 뒤 이메일로 알려 드립니다(Airbnb와 같은 방식). 지도는 대략적인 위치만 보여 줍니다.",
  s1t:"맡기기 예약", s1b:"배송 국가와 짐의 크기를 짧은 양식에 입력해 주세요. 맡기실 장소와 시간은 이메일로 확인해 드립니다.",
  s2t:"짐을 맡겨주세요", s2b:"아키하바라에서 직접 전달하거나 호텔에서 보내주세요. 하나하나 확인 후 다시 포장합니다.",
  s3t:"통관 서류는 저희가", s3b:"일본우편은 손으로 쓴 통관 라벨을 더 이상 받지 않으며, 온라인 시스템은 일본어뿐입니다. 고객님 명의로 정확히 작성합니다.",
@@ -490,6 +532,7 @@ ja:{
  ship_h:"2つの送り方", ship_intl:"海外発送", ship_hotel:"ホテル配送（日本国内）",
  ship_note:"航空会社に追加の預け荷物の料金を払うより手間がかからないことが多く、大きな荷物を空港まで運ぶ必要もありません。小さな荷物もお受けしますし、日本国内の次のホテルへお届けすることもできます。表示は最低料金です。",
  how_h:"ご利用の流れ",
+ where_h:"お預かりの場所", where_lead:"秋葉原と御徒町のあいだ、電気街から北へ歩いて数分のところです。", where_st1:"末広町駅（銀座線）", where_m1:"徒歩4分", where_st2:"仲御徒町駅（日比谷線）", where_m2:"徒歩6分", where_st3:"御徒町駅（JR）", where_m3:"徒歩7分", where_st4:"秋葉原駅（JR）", where_m4:"徒歩8分", where_note:"受付は個人の住まいのため、正確な住所（建物名・部屋番号）は予約が確定したあとにメールでお知らせします（Airbnb と同じ方式です）。地図はおおよその場所だけを示しています。",
  s1t:"預け入れを予約", s1b:"送り先の国と荷物の大きさを短いフォームに入れてください。預け入れの場所と時間は、予約確認メールでお知らせします。",
  s2t:"荷物をお預けください", s2b:"秋葉原で直接お渡しいただくか、ホテルからお送りください。中身を確認して梱包し直します。",
  s3t:"通関書類は当方で作成", s3b:"日本郵便は手書きラベルを受け付けておらず、オンラインシステムは日本語のみです。お客様名義で正確に作成します。",
