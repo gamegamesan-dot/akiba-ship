@@ -691,8 +691,11 @@ function buildLinks(total, q, packed){
 
 ["dest","wt","days","over90"].forEach(function(id){ $(id).addEventListener("change", calc); });
 
-/* 端末の言語で初期表示を切り替え */
+/* 端末の言語で初期表示を切り替え（URLの ?lang=en などがあればそちらを優先） */
 (function(){
+  var forced=null;
+  try{ forced=new URLSearchParams(location.search).get("lang"); }catch(e){}
+  if(forced && I18N[forced]){ applyLang(forced); return; }
   var n=(navigator.language||"en").toLowerCase();
   var pick="en";
   if(n.indexOf("zh")===0) pick = (n.indexOf("cn")>-1||n.indexOf("hans")>-1) ? "zh-Hans" : "zh-Hant";
